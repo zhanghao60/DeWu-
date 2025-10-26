@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/gradient_background"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <!-- 顶部标题区域 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="32dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:shadowColor="@color/black"
+                android:shadowDx="2"
+                android:shadowDy="2"
+                android:shadowRadius="4" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/welcome_message"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:layout_marginTop="8dp"
+                android:alpha="0.9" />
+
+        </LinearLayout>
+
+        <!-- 主要内容卡片 -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/background_card">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/description"
+                    android:textSize="16sp"
+                    android:textColor="@color/text_primary"
+                    android:lineSpacingExtra="4dp"
+                    android:gravity="center" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/divider"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- 功能按钮区域 -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <!-- 无障碍服务按钮 -->
+                    <Button
+                        android:id="@+id/btnAccessibilityService"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/accessibility_service_button"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_accessibility"
+                        android:layout_marginBottom="12dp"
+                        android:elevation="4dp" />
+
+                    <!-- 启动脚本按钮 -->
+                    <Button
+                        android:id="@+id/btnStartScript"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/start_script_button"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_primary"
+                        android:layout_marginBottom="12dp"
+                        android:elevation="4dp" />
+
+                    <!-- 停止脚本按钮 -->
+                    <Button
+                        android:id="@+id/btnStopScript"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="停止脚本"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_stop"
+                        android:layout_marginBottom="12dp"
+                        android:elevation="4dp"
+                        android:visibility="gone" />
+
+                    <!-- 管理链接按钮 -->
+                    <Button
+                        android:id="@+id/btnManageLinks"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/manage_links_button"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_secondary"
+                        android:layout_marginBottom="12dp"
+                        android:elevation="4dp" />
+
+                    <!-- 说明文档按钮 -->
+                    <Button
+                        android:id="@+id/btnHelpDocument"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="@string/help_document_button"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_secondary"
+                        android:layout_marginBottom="12dp"
+                        android:elevation="4dp" />
+
+                    <!-- 设置按钮 -->
+                    <Button
+                        android:id="@+id/btnSettings"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:text="脚本设置"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/white"
+                        android:background="@drawable/button_secondary"
+                        android:elevation="4dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- 底部版本信息 -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/version_info"
+                android:textSize="12sp"
+                android:textColor="@color/white"
+                android:alpha="0.7" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>

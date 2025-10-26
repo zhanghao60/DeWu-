@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">得物自动化脚本</string>
+    <string name="title">得物自动化脚本</string>
+    <string name="welcome_message">欢迎使用得物自动化脚本</string>
+    <string name="description">智能化的购物助手，让您的购物体验更加便捷</string>
+    <string name="start_script_button">启动脚本</string>
+    <string name="accessibility_service_button">打开无障碍服务</string>
+    <string name="manage_links_button">管理链接</string>
+    <string name="help_document_button">说明文档</string>
+    <string name="version_info">版本 1.0.0</string>
+    
+    <!-- URL管理相关 -->
+    <string name="url_manager_title">链接管理器</string>
+    <string name="url_manager_subtitle">添加和管理您的网页链接</string>
+    <string name="add_new_link">添加新链接</string>
+    <string name="url_input_hint">请输入网页链接</string>
+    <string name="add_link_button">添加链接</string>
+    <string name="saved_links">已保存的链接</string>
+    <string name="empty_links_message">暂无保存的链接\n点击上方按钮添加链接</string>
+    <string name="save_to_file">保存到文件</string>
+    <string name="load_from_file">从文件加载</string>
+    <string name="import_from_file">导入JSON文件</string>
+    <string name="edit_url">编辑链接</string>
+    <string name="save_changes">保存修改</string>
+    <string name="cancel_edit">取消编辑</string>
+    <string name="edit_url_title">编辑链接</string>
+    <string name="url_title_hint">链接标题（可选）</string>
+    <string name="url_address_hint">链接地址</string>
+    
+    <!-- 帮助文档相关 -->
+    <string name="help_title">使用说明</string>
+    <string name="help_content">得物自动化脚本使用说明\n\n⚠️ 重要提醒\n\n使用本应用前，请务必完成以下权限设置：\n\n1. 无障碍服务权限（必需）\n- 点击"启动脚本"按钮\n- 系统会提示启用无障碍服务\n- 在无障碍设置中找到"得物自动化脚本"并开启\n- 路径：设置 → 更多设置 → 无障碍 → 得物自动化脚本\n\n2. 悬浮窗权限（必需！防止被后台杀死）\n- 首次启动脚本会提示授予悬浮窗权限\n- 点击"允许显示在其他应用上层"\n- 此权限可防止应用在后台被MIUI清理\n- 路径：设置 → 应用设置 → 权限管理 → 悬浮窗 → 得物自动化脚本\n\n3. 截屏权限（必需）\n- 点击"启动脚本"按钮时，系统会请求截屏权限\n- 在弹出的权限请求对话框中点击"立即开始"\n- 如果权限被拒绝，请到设置中重新授权\n\n4. 后台服务权限（必需）\n- 设置 → 应用设置 → 应用管理 → 得物自动化脚本\n- 点击"省电策略" → 选择"无限制"\n- 开启"自启动"权限\n- 确保"后台运行权限"已开启\n\n5. MIUI用户额外设置\n- 打开"最近任务"，找到"得物自动化脚本"应用卡片\n- 下拉卡片，点击🔒图标锁定应用\n- 关闭省电模式：设置 → 电池与性能 → 关闭省电模式\n- 关闭MIUI优化：设置 → 更多设置 → 开发者选项 → 关闭MIUI优化\n\n功能介绍\n\n1. 启动脚本\n点击"启动脚本"按钮可以运行自动化脚本\n脚本将根据您保存的链接进行自动化操作\n支持智能控件查找和批量处理\n\n2. 管理链接\n添加网页链接到本地数据库\n编辑已保存的链接信息\n删除不需要的链接\n在浏览器中打开链接\n将链接保存到JSON文件\n\n3. 脚本设置\n自定义等待时间（建议2000-5000毫秒）\n设置最多操作控件数量（默认12个）\n设置每批查找控件数量（默认4个）\n选择是否启用点击后滑动\n配置重试参数\n\n4. 链接管理功能\n\n添加链接\n1.在输入框中输入网页链接\n2.点击"添加链接"按钮\n3.系统会自动验证链接格式\n4.重复链接将被拒绝\n\n编辑链接\n1.点击链接项右侧的编辑按钮\n2.修改链接标题或地址\n3.点击"保存修改"确认更改\n4.点击"取消编辑"放弃更改\n\n删除链接\n1.点击链接项右侧的删除按钮\n2.确认删除操作\n\n打开链接\n1.点击链接项右侧的打开按钮\n2.系统将在默认浏览器中打开链接\n\n数据存储\n\n所有链接数据保存在应用内部存储中\n支持导出为JSON格式文件\n支持从JSON文件导入链接\n数据在应用卸载时会被清除\n\n注意事项\n\n请确保输入的链接格式正确\n建议定期备份链接数据\n部分链接可能需要网络权限才能正常打开\n如遇到问题，请检查网络连接\n\n故障排除\n\n脚本无法启动：检查无障碍服务是否已开启\n脚本执行中断：检查悬浮窗权限和后台权限\n无法截屏：检查截屏权限是否已授予\nAPI请求失败：检查网络连接和权限\n\n版本信息\n\n当前版本：1.0.0\n更新时间：2025年10月</string>
+    
+    <!-- 无障碍服务相关 -->
+    <string name="accessibility_service_description">得物自动化脚本无障碍服务，用于实现自动化操作功能，包括截屏、点击、滑动等操作。此服务需要无障碍权限才能正常工作。</string>
+</resources>

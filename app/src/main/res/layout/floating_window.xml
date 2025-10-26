@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/floating_window_background"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:clickable="true"
+    android:focusable="false">
+
+    <TextView
+        android:id="@+id/status_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="脚本执行中..."
+        android:textColor="@android:color/white"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="（点击暂停）"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:alpha="0.8"
+        android:layout_marginTop="4dp" />
+
+</LinearLayout>
+

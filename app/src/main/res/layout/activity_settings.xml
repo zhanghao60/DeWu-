@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:paddingBottom="32dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="脚本设置"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- 基础设置 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="基础设置"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击启动得物app按钮之后等待时间（秒）"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_dewu_app_wait_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="例如：3 表示3秒"
+            android:inputType="number"
+            android:layout_marginBottom="12dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:text="控件重复点击次数:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_click_loop_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="5"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.2"
+                android:text="最多操作控件数量:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_max_control_count"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="12"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/cb_enable_scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击控件后向左滑动"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+        <CheckBox
+            android:id="@+id/cb_click_product_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击商品链接"
+            android:textSize="14sp"
+            android:layout_marginBottom="8dp" />
+
+
+        <!-- 向左滑动参数 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="向左滑动参数"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_start_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="800"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始Y:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_start_y"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="1200"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_end_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="200"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束Y:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_end_y"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="1200"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="滑动时长(秒):"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="0.3"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="滑动前等待(秒):"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_swipe_wait_time"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="0.5"
+                android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <!-- 说明 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="💡 参数说明"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• 点击启动得物app按钮之后等待时间：点击启动得物app按钮后等待页面加载的时间\n• 控件重复点击次数：每个控件重复【点击→等待→返回】的次数\n• 最多操作控件数量：脚本最多处理的控件数量\n• 点击后滑动：每次点击控件后向左滑动（用于切换图片）\n• 点击商品链接：每次滑动后是否点击商品链接进入详情页\n• 滑动参数：起始坐标→结束坐标，时长控制滑动速度\n• 滑动前等待：点击控件后到开始滑动前的等待时间\n\n默认：点击5次，最多12个控件，滑动(800,1200)→(200,1200)，滑动前等待0.5秒，点击启动得物app按钮后等待3秒，不点击商品链接"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:lineSpacingExtra="2dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_save_settings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="保存设置"
+            android:textSize="16sp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="16dp" />
+
+    </LinearLayout>
+
+</ScrollView>
+
