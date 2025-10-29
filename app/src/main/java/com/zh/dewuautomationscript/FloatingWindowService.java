@@ -1,5 +1,8 @@
 package com.zh.dewuautomationscript;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +16,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
+
+import androidx.core.app.NotificationCompat;
 
 /**
  * 悬浮窗服务
@@ -34,6 +39,48 @@ public class FloatingWindowService extends Service {
         super.onCreate();
         instance = this;
         isPaused = false;
+        
+        // Android 8.0+ 前台服务支持
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                String channelId = "floating_window_channel";
+                String channelName = "悬浮窗服务";
+                
+                NotificationChannel channel = new NotificationChannel(
+                    channelId,
+                    channelName,
+                    NotificationManager.IMPORTANCE_LOW
+                );
+                channel.setShowBadge(false);
+                channel.enableLights(false);
+                channel.enableVibration(false);
+                channel.setSound(null, null);
+                
+                NotificationManager manager = getSystemService(NotificationManager.class);
+                if (manager != null) {
+                    manager.createNotificationChannel(channel);
+                }
+                
+                Notification notification = new NotificationCompat.Builder(this, channelId)
+                    .setContentTitle("脚本运行中")
+                    .setContentText("正在执行自动化任务...")
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setOngoing(true)
+                    .setPriority(NotificationCompat.PRIORITY_LOW)
+                    .build();
+                
+                // Android 12+ 需要指定前台服务类型
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    startForeground(1, notification, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+                } else {
+                    startForeground(1, notification);
+                }
+                Log.d(TAG, "前台服务已启动");
+            } catch (Exception e) {
+                Log.e(TAG, "启动前台服务失败", e);
+            }
+        }
+        
         Log.d(TAG, "FloatingWindowService created");
         createFloatingWindow();
     }
@@ -176,7 +223,19 @@ public class FloatingWindowService extends Service {
     public static void startService(Context context, String status) {
         Intent intent = new Intent(context, FloatingWindowService.class);
         intent.putExtra("status", status);
-        context.startService(intent);
+        
+        // Android 8.0+ 使用前台服务
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            try {
+                context.startForegroundService(intent);
+            } catch (IllegalStateException e) {
+                Log.e(TAG, "启动前台服务失败: " + e.getMessage());
+                // 降级到普通启动
+                context.startService(intent);
+            }
+        } else {
+            context.startService(intent);
+        }
     }
     
     /**

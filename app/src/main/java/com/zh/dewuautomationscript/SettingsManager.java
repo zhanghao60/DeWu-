@@ -21,10 +21,6 @@ public class SettingsManager {
     private static final String KEY_MAX_CONTROL_COUNT = "max_control_count"; // 最多操作控件数量
     private static final String KEY_DEWU_APP_WAIT_TIME = "dewu_app_wait_time"; // 点击启动得物app按钮后的等待时间
     private static final String KEY_CLICK_PRODUCT_LINK = "click_product_link"; // 是否点击商品链接
-    private static final String KEY_ACTIVATE_CODE = "activate_code"; // 激活码
-    private static final String KEY_IS_ACTIVATED = "is_activated"; // 是否已激活
-    private static final String KEY_ACTIVATION_TIME = "activation_time"; // 激活时间戳
-    private static final String KEY_VALID_TIME = "valid_time"; // 有效期时间
     
     // 默认值
     private static final boolean DEFAULT_ENABLE_SWIPE_AFTER_CLICK = false;
@@ -38,10 +34,6 @@ public class SettingsManager {
     private static final int DEFAULT_MAX_CONTROL_COUNT = 12; // 12个控件
     private static final int DEFAULT_DEWU_APP_WAIT_TIME = 3000; // 点击启动得物app按钮后等待3秒
     private static final boolean DEFAULT_CLICK_PRODUCT_LINK = false; // 默认不点击商品链接
-    private static final String DEFAULT_ACTIVATE_CODE = ""; // 默认激活码为空
-    private static final boolean DEFAULT_IS_ACTIVATED = false; // 默认未激活
-    private static final long DEFAULT_ACTIVATION_TIME = 0; // 默认激活时间为0
-    private static final String DEFAULT_VALID_TIME = "7days"; // 默认有效期7天
     
     private SharedPreferences preferences;
     
@@ -168,159 +160,6 @@ public class SettingsManager {
      */
     public void setClickProductLinkEnabled(boolean enabled) {
         preferences.edit().putBoolean(KEY_CLICK_PRODUCT_LINK, enabled).apply();
-    }
-    
-    // ==================== 激活码相关设置 ====================
-    
-    /**
-     * 获取激活码
-     */
-    public String getActivateCode() {
-        return preferences.getString(KEY_ACTIVATE_CODE, DEFAULT_ACTIVATE_CODE);
-    }
-    
-    /**
-     * 设置激活码
-     */
-    public void setActivateCode(String activateCode) {
-        preferences.edit().putString(KEY_ACTIVATE_CODE, activateCode).apply();
-    }
-    
-    /**
-     * 检查是否已激活（考虑3天周期）
-     */
-    public boolean isActivated() {
-        boolean activated = preferences.getBoolean(KEY_IS_ACTIVATED, DEFAULT_IS_ACTIVATED);
-        if (!activated) {
-            return false;
-        }
-        
-        // 检查是否超过有效期
-        long activationTime = preferences.getLong(KEY_ACTIVATION_TIME, DEFAULT_ACTIVATION_TIME);
-        long currentTime = System.currentTimeMillis();
-        long validTimeInMillis = getValidTimeInMillis();
-        
-        if (currentTime - activationTime > validTimeInMillis) {
-            // 超过有效期，需要重新激活
-            return false;
-        }
-        
-        return true;
-    }
-    
-    /**
-     * 设置激活状态
-     */
-    public void setActivated(boolean activated) {
-        preferences.edit().putBoolean(KEY_IS_ACTIVATED, activated).apply();
-        if (activated) {
-            // 激活时记录当前时间
-            setActivationTime(System.currentTimeMillis());
-        }
-    }
-    
-    /**
-     * 设置激活状态和有效期
-     */
-    public void setActivated(boolean activated, String validTime) {
-        preferences.edit()
-                .putBoolean(KEY_IS_ACTIVATED, activated)
-                .putString(KEY_VALID_TIME, validTime)
-                .apply();
-        if (activated) {
-            // 激活时记录当前时间
-            setActivationTime(System.currentTimeMillis());
-        }
-    }
-    
-    /**
-     * 获取激活时间
-     */
-    public long getActivationTime() {
-        return preferences.getLong(KEY_ACTIVATION_TIME, DEFAULT_ACTIVATION_TIME);
-    }
-    
-    /**
-     * 设置激活时间
-     */
-    public void setActivationTime(long activationTime) {
-        preferences.edit().putLong(KEY_ACTIVATION_TIME, activationTime).apply();
-    }
-    
-    /**
-     * 获取有效期时间字符串
-     */
-    public String getValidTime() {
-        return preferences.getString(KEY_VALID_TIME, DEFAULT_VALID_TIME);
-    }
-    
-    /**
-     * 设置有效期时间字符串
-     */
-    public void setValidTime(String validTime) {
-        preferences.edit().putString(KEY_VALID_TIME, validTime).apply();
-    }
-    
-    /**
-     * 将有效期字符串转换为毫秒数
-     */
-    private long getValidTimeInMillis() {
-        String validTime = getValidTime();
-        try {
-            if (validTime.endsWith("days")) {
-                int days = Integer.parseInt(validTime.replace("days", ""));
-                return days * 24 * 60 * 60 * 1000L;
-            } else if (validTime.endsWith("hours")) {
-                int hours = Integer.parseInt(validTime.replace("hours", ""));
-                return hours * 60 * 60 * 1000L;
-            } else if (validTime.endsWith("minutes")) {
-                int minutes = Integer.parseInt(validTime.replace("minutes", ""));
-                return minutes * 60 * 1000L;
-            }
-        } catch (NumberFormatException e) {
-            // 解析失败，使用默认7天
-        }
-        return 7 * 24 * 60 * 60 * 1000L; // 默认7天
-    }
-    
-    /**
-     * 获取剩余激活时间（毫秒）
-     */
-    public long getRemainingActivationTime() {
-        long activationTime = getActivationTime();
-        long currentTime = System.currentTimeMillis();
-        long validTimeInMillis = getValidTimeInMillis();
-        
-        long elapsed = currentTime - activationTime;
-        return Math.max(0, validTimeInMillis - elapsed);
-    }
-    
-    /**
-     * 获取剩余激活天数
-     */
-    public int getRemainingActivationDays() {
-        long remainingMillis = getRemainingActivationTime();
-        return (int) (remainingMillis / (24 * 60 * 60 * 1000L));
-    }
-    
-    /**
-     * 获取剩余激活小时数
-     */
-    public int getRemainingActivationHours() {
-        long remainingMillis = getRemainingActivationTime();
-        return (int) ((remainingMillis % (24 * 60 * 60 * 1000L)) / (60 * 60 * 1000L));
-    }
-    
-    /**
-     * 清除激活信息
-     */
-    public void clearActivation() {
-        preferences.edit()
-                .remove(KEY_ACTIVATE_CODE)
-                .putBoolean(KEY_IS_ACTIVATED, false)
-                .putLong(KEY_ACTIVATION_TIME, DEFAULT_ACTIVATION_TIME)
-                .putString(KEY_VALID_TIME, DEFAULT_VALID_TIME)
-                .apply();
     }
 }
 

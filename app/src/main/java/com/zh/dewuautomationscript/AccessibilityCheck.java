@@ -149,19 +149,78 @@ public class AccessibilityCheck {
             }
         }
         
-        // 方法2: 对于 OPPO/OnePlus
+        // 方法2: 对于 OPPO/OnePlus/Realme
         if (!success && (manufacturer.contains("oppo") || manufacturer.contains("oneplus") || manufacturer.contains("realme"))) {
             try {
+                // 尝试1: OPPO/Realme特定的无障碍Intent
                 Intent intent2 = new Intent("oppo.settings.accessibility");
                 intent2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent2.putExtra("service_name", serviceName);
                 if (intent2.resolveActivity(context.getPackageManager()) != null) {
                     context.startActivity(intent2);
-                    Log.d(TAG, "OPPO设备: 使用OPPO特定的Intent");
+                    Log.d(TAG, "OPPO/Realme设备: 使用oppo.settings.accessibility");
                     success = true;
                 }
             } catch (Exception e) {
-                Log.d(TAG, "OPPO特定Intent失败: " + e.getMessage());
+                Log.d(TAG, "oppo.settings.accessibility失败: " + e.getMessage());
+            }
+            
+            // 尝试2: ColorOS原生无障碍设置
+            if (!success) {
+                try {
+                    Intent intent2a = new Intent();
+                    intent2a.setComponent(android.content.ComponentName.unflattenFromString("com.coloros.accessibility/com.coloros.accessibility.page.UniversalAccessibility"));
+                    intent2a.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent2a.putExtra("service_name", serviceName);
+                    if (intent2a.resolveActivity(context.getPackageManager()) != null) {
+                        context.startActivity(intent2a);
+                        Log.d(TAG, "Realme设备: 使用ColorOS无障碍组件");
+                        success = true;
+                    }
+                } catch (Exception e) {
+                    Log.d(TAG, "ColorOS组件失败: " + e.getMessage());
+                }
+            }
+            
+            // 尝试3: 真我手机特定的Settings
+            if (!success && manufacturer.contains("realme")) {
+                try {
+                    // 尝试不指定package，让系统自动选择
+                    Intent intent2b = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                    intent2b.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent2b.putExtra("service_name", serviceName);
+                    intent2b.putExtra("component_name", serviceName);
+                    context.startActivity(intent2b);
+                    Log.d(TAG, "Realme设备: 使用ACTION_ACCESSIBILITY_SETTINGS");
+                    success = true;
+                } catch (Exception e) {
+                    Log.d(TAG, "ACTION_ACCESSIBILITY_SETTINGS失败: " + e.getMessage());
+                    // 如果不带参数的也不行，试试带指定package
+                    try {
+                        Intent intent2b2 = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                        intent2b2.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        intent2b2.setPackage("com.android.settings");
+                        context.startActivity(intent2b2);
+                        Log.d(TAG, "Realme设备: 使用com.android.settings");
+                        success = true;
+                    } catch (Exception e2) {
+                        Log.d(TAG, "com.android.settings失败: " + e2.getMessage());
+                    }
+                }
+            }
+            
+            // 尝试4: 直接使用packageName参数
+            if (!success) {
+                try {
+                    Intent intent2c = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                    intent2c.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent2c.putExtra("packageName", context.getPackageName());
+                    context.startActivity(intent2c);
+                    Log.d(TAG, "Realme设备: 使用packageName参数");
+                    success = true;
+                } catch (Exception e) {
+                    Log.d(TAG, "packageName参数失败: " + e.getMessage());
+                }
             }
         }
         
@@ -186,13 +245,24 @@ public class AccessibilityCheck {
             success = openAppAccessibilitySettingsDirect(context, serviceName);
         }
         
+        // 方法5: 如果针对厂商的所有方法都失败，尝试标准的无障碍设置页面
+        if (!success) {
+            try {
+                Log.d(TAG, "尝试打开标准无障碍设置页面");
+                openAccessibilitySettings(context);
+                success = true;
+            } catch (Exception e) {
+                Log.e(TAG, "打开标准无障碍设置页面失败: " + e.getMessage());
+            }
+        }
+        
         if (success) {
             // 成功跳转后，显示提示
             Toast.makeText(context, "请在页面中找到「得物自动化脚本」并开启", Toast.LENGTH_LONG).show();
         } else {
             // 所有方法都失败
             Log.e(TAG, "所有方法都失败，无法打开指定应用的无障碍设置");
-            Toast.makeText(context, "无法打开无障碍设置页面", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "无法打开无障碍设置页面，请手动进入设置-无障碍服务开启", Toast.LENGTH_LONG).show();
         }
     }
     

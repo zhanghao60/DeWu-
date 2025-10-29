@@ -1,7 +1,5 @@
 package com.zh.dewuautomationscript;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
@@ -10,17 +8,15 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
     
-    private Button btnStartScript, btnStopScript, btnManageLinks, btnHelpDocument, btnSettings, btnAccessibilityService;
+    private Button btnStartScript, btnStopScript, btnManageLinks, btnHelpDocument, btnSettings, btnAccessibilityService, btnOverlayPermission;
     private AutomationScriptExecutor scriptExecutor;
     private SettingsManager settingsManager;
-    private ActivationApiService activationApiService;
     
     @Override
     protected void onCreate(Bundle savedInstanceState){
@@ -44,16 +40,13 @@ public class MainActivity extends AppCompatActivity {
         btnHelpDocument = findViewById(R.id.btnHelpDocument);
         btnSettings = findViewById(R.id.btnSettings);
         btnAccessibilityService = findViewById(R.id.btnAccessibilityService);
+        btnOverlayPermission = findViewById(R.id.btnOverlayPermission);
     }
     
     private void initData() {
         try {
             scriptExecutor = new AutomationScriptExecutor(this);
             settingsManager = new SettingsManager(this);
-            activationApiService = new ActivationApiService();
-            
-            // 检查激活状态
-            checkActivationStatus();
         } catch (Exception e) {
             Log.e("MainActivity", "初始化数据失败", e);
             Toast.makeText(this, "初始化失败: " + e.getMessage(), Toast.LENGTH_LONG).show();
@@ -72,6 +65,29 @@ public class MainActivity extends AppCompatActivity {
                 } catch (Exception e) {
                     Log.e("MainActivity", "打开无障碍设置失败", e);
                     Toast.makeText(MainActivity.this, "打开无障碍设置失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        
+        btnOverlayPermission.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                try {
+                    // 检查悬浮窗权限
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(MainActivity.this)) {
+                        // 显示说明
+                        Toast.makeText(MainActivity.this, "正在跳转到权限设置...", Toast.LENGTH_SHORT).show();
+                        
+                        // 打开悬浮窗权限设置页面
+                        Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                        intent.setData(Uri.parse("package:" + getPackageName()));
+                        startActivity(intent);
+                    } else {
+                        Toast.makeText(MainActivity.this, "悬浮窗权限已授予", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (Exception e) {
+                    Log.e("MainActivity", "打开悬浮窗权限设置失败", e);
+                    Toast.makeText(MainActivity.this, "打开权限设置失败: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -308,96 +324,9 @@ public class MainActivity extends AppCompatActivity {
                 scriptExecutor.release();
                 scriptExecutor = null;
             }
-            if (activationApiService != null) {
-                activationApiService.release();
-                activationApiService = null;
-            }
         } catch (Exception e) {
             Log.e("MainActivity", "清理资源时发生错误", e);
         }
     }
     
-    /**
-     * 检查激活状态
-     */
-    private void checkActivationStatus() {
-        if (!settingsManager.isActivated()) {
-            showActivationDialog();
-        }
-    }
-    
-    /**
-     * 显示激活码输入对话框
-     */
-    private void showActivationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("软件激活");
-        
-        // 简化激活对话框消息
-        String message = "请输入激活码以使用本软件";
-        
-        builder.setMessage(message);
-        
-        // 创建输入框
-        final EditText input = new EditText(this);
-        input.setHint("请输入激活码");
-        builder.setView(input);
-        
-        builder.setPositiveButton("激活", (dialog, which) -> {
-            String activateCode = input.getText().toString().trim();
-            if (activateCode.isEmpty()) {
-                Toast.makeText(this, "激活码不能为空", Toast.LENGTH_SHORT).show();
-                showActivationDialog(); // 重新显示对话框
-            } else {
-                verifyActivateCode(activateCode);
-            }
-        });
-        
-        builder.setNegativeButton("退出", (dialog, which) -> {
-            finish(); // 退出应用
-        });
-        
-        builder.setCancelable(false); // 不允许取消对话框
-        builder.show();
-    }
-    
-    /**
-     * 格式化时间显示
-     */
-    private String formatTime(long timestamp) {
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault());
-        return sdf.format(new java.util.Date(timestamp));
-    }
-    
-    /**
-     * 验证激活码
-     */
-    private void verifyActivateCode(String activateCode) {
-        Toast.makeText(this, "正在验证激活码...", Toast.LENGTH_SHORT).show();
-        
-        activationApiService.verifyActivateCode(activateCode, new ActivationApiService.ActivationCallback() {
-            @Override
-            public void onSuccess(String message, String validTime) {
-                runOnUiThread(() -> {
-                    // 激活成功，保存激活信息和有效期
-                    settingsManager.setActivateCode(activateCode);
-                    settingsManager.setActivated(true, validTime);
-                    
-                    Toast.makeText(MainActivity.this, "激活成功！有效期" + validTime, Toast.LENGTH_SHORT).show();
-                    Log.d("MainActivity", "激活码验证成功: " + activateCode + ", 有效期: " + validTime);
-                });
-            }
-            
-            @Override
-            public void onError(String error) {
-                runOnUiThread(() -> {
-                    Toast.makeText(MainActivity.this, "激活失败: " + error, Toast.LENGTH_LONG).show();
-                    Log.e("MainActivity", "激活码验证失败: " + error);
-                    
-                    // 激活失败，重新显示激活对话框
-                    showActivationDialog();
-                });
-            }
-        });
-    }
 }

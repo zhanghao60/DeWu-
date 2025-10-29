@@ -688,9 +688,9 @@ public class AutomationScriptExecutor {
                 scrollDistance = y - screenHeight;
             }
             
-            // 如果滚动距离小于50，固定为80（保持原方向）
+            // 如果滚动距离小于50，固定为150（保持原方向）
             if (Math.abs(scrollDistance) < 50) {
-                scrollDistance = scrollDistance >= 0 ? 100 : -100;
+                scrollDistance = scrollDistance >= 0 ? 180 : -180;
             }
             
             Log.d(TAG, "滚动距离: " + scrollDistance);

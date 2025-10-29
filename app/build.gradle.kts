@@ -5,13 +5,13 @@ plugins {
 android {
     namespace = "com.zh.dewuautomationscript"
     compileSdk {
-        version = release(36)
+        version = release(34)  // Android 14 - 满足依赖要求
     }
 
     defaultConfig {
         applicationId = "com.zh.dewuautomationscript"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 31  // Android 12 - 保持应用行为不变
         versionCode = 1
         versionName = "1.0"
 
@@ -35,6 +35,7 @@ android {
 
 dependencies {
     implementation(libs.appcompat)
+    implementation(libs.core)
     implementation(libs.material)
     implementation(libs.cardview)
     implementation(libs.gson)
