@@ -25,7 +25,7 @@
                 android:id="@+id/tvUrlTitle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="网页标题"
+                android:text="商品标题"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 android:textColor="@color/text_primary"
@@ -36,7 +36,7 @@
                 android:id="@+id/tvUrlAddress"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="https://example.com"
+                android:text="发布人"
                 android:textSize="14sp"
                 android:textColor="@color/text_secondary"
                 android:layout_marginTop="4dp"
@@ -57,18 +57,9 @@
                 android:layout_height="40dp"
                 android:src="@android:drawable/ic_menu_edit"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="编辑链接"
+                android:contentDescription="编辑商品"
                 android:layout_marginEnd="4dp"
                 android:tint="@color/primary_blue" />
-
-            <ImageButton
-                android:id="@+id/btnOpenUrl"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@android:drawable/ic_menu_view"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:contentDescription="打开链接"
-                android:layout_marginEnd="4dp" />
 
             <ImageButton
                 android:id="@+id/btnDeleteUrl"

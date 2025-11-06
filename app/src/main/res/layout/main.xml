@@ -131,6 +131,7 @@
                         android:textStyle="bold"
                         android:textColor="@color/white"
                         android:background="@drawable/button_stop"
+                        app:backgroundTint="@null"
                         android:layout_marginBottom="12dp"
                         android:elevation="4dp"
                         android:visibility="gone" />

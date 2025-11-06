@@ -72,15 +72,32 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
-                    android:hint="@string/url_input_hint"
+                    android:hint="@string/product_title_hint"
                     app:boxStrokeColor="@color/primary_blue"
                     app:hintTextColor="@color/primary_blue">
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etUrlInput"
+                        android:id="@+id/etProductTitle"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textUri"
+                        android:inputType="text"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    android:hint="@string/publisher_hint"
+                    app:boxStrokeColor="@color/primary_blue"
+                    app:hintTextColor="@color/primary_blue">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etPublisher"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="text"
                         android:textSize="16sp" />
 
                 </com.google.android.material.textfield.TextInputLayout>

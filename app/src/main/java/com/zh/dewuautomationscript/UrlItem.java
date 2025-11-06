@@ -4,16 +4,16 @@ import java.io.Serializable;
 
 public class UrlItem implements Serializable {
     private String title;
-    private String url;
+    private String publisher;
     private long timestamp;
 
     public UrlItem() {
         this.timestamp = System.currentTimeMillis();
     }
 
-    public UrlItem(String title, String url) {
+    public UrlItem(String title, String publisher) {
         this.title = title;
-        this.url = url;
+        this.publisher = publisher;
         this.timestamp = System.currentTimeMillis();
     }
 
@@ -25,12 +25,23 @@ public class UrlItem implements Serializable {
         this.title = title;
     }
 
-    public String getUrl() {
-        return url;
+    public String getPublisher() {
+        return publisher;
     }
 
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    // 为了向后兼容，保留getUrl和setUrl方法，但映射到publisher
+    @Deprecated
+    public String getUrl() {
+        return publisher;
+    }
+
+    @Deprecated
     public void setUrl(String url) {
-        this.url = url;
+        this.publisher = url;
     }
 
     public long getTimestamp() {
@@ -45,7 +56,7 @@ public class UrlItem implements Serializable {
     public String toString() {
         return "UrlItem{" +
                 "title='" + title + '\'' +
-                ", url='" + url + '\'' +
+                ", publisher='" + publisher + '\'' +
                 ", timestamp=" + timestamp +
                 '}';
     }

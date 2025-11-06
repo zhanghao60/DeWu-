@@ -21,6 +21,17 @@ public class SettingsManager {
     private static final String KEY_MAX_CONTROL_COUNT = "max_control_count"; // 最多操作控件数量
     private static final String KEY_DEWU_APP_WAIT_TIME = "dewu_app_wait_time"; // 点击启动得物app按钮后的等待时间
     private static final String KEY_CLICK_PRODUCT_LINK = "click_product_link"; // 是否点击商品链接
+    private static final String KEY_ENTER_HOME_PAGE_WAIT_TIME = "enter_home_page_wait_time"; // 点击进入主页的按钮后需要等待多少秒
+    private static final String KEY_SEARCH_PRODUCT_SWIPE_START_X = "search_product_swipe_start_x"; // 搜索商品时滑动起始X
+    private static final String KEY_SEARCH_PRODUCT_SWIPE_START_Y = "search_product_swipe_start_y"; // 搜索商品时滑动起始Y
+    private static final String KEY_SEARCH_PRODUCT_SWIPE_END_X = "search_product_swipe_end_x"; // 搜索商品时滑动结束X
+    private static final String KEY_SEARCH_PRODUCT_SWIPE_END_Y_OFFSET = "search_product_swipe_end_y_offset"; // 搜索商品时滑动结束Y偏移量
+    private static final String KEY_SEARCH_PRODUCT_SWIPE_DURATION = "search_product_swipe_duration"; // 搜索商品时滑动持续时间
+    private static final String KEY_USER_HOME_PAGE_SWIPE_START_X = "user_home_page_swipe_start_x"; // 用户主页滑动起始X
+    private static final String KEY_USER_HOME_PAGE_SWIPE_START_Y = "user_home_page_swipe_start_y"; // 用户主页滑动起始Y
+    private static final String KEY_USER_HOME_PAGE_SWIPE_END_X = "user_home_page_swipe_end_x"; // 用户主页滑动结束X
+    private static final String KEY_USER_HOME_PAGE_SWIPE_END_Y_OFFSET = "user_home_page_swipe_end_y_offset"; // 用户主页滑动结束Y偏移量（用于动态计算）
+    private static final String KEY_USER_HOME_PAGE_SWIPE_DURATION = "user_home_page_swipe_duration"; // 用户主页滑动持续时间
     
     // 默认值
     private static final boolean DEFAULT_ENABLE_SWIPE_AFTER_CLICK = false;
@@ -34,6 +45,17 @@ public class SettingsManager {
     private static final int DEFAULT_MAX_CONTROL_COUNT = 12; // 12个控件
     private static final int DEFAULT_DEWU_APP_WAIT_TIME = 3000; // 点击启动得物app按钮后等待3秒
     private static final boolean DEFAULT_CLICK_PRODUCT_LINK = false; // 默认不点击商品链接
+    private static final int DEFAULT_ENTER_HOME_PAGE_WAIT_TIME = 2000; // 点击进入主页的按钮后等待2秒
+    private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_START_X = 0; // 0表示屏幕中心（screenWidth/2）
+    private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_START_Y = -400; // -400表示screenHeight-400（负数表示从底部偏移）
+    private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_END_X = 0; // 0表示屏幕中心（screenWidth/2）
+    private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_END_Y_OFFSET = -400; // -400表示screenHeight-scrollDistance-400（负数表示从底部偏移）
+    private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_DURATION = 2000; // 2000毫秒
+    private static final int DEFAULT_USER_HOME_PAGE_SWIPE_START_X = 500; // 绝对坐标
+    private static final int DEFAULT_USER_HOME_PAGE_SWIPE_START_Y = -400; // -400表示screenHeight-400（负数表示从底部偏移）
+    private static final int DEFAULT_USER_HOME_PAGE_SWIPE_END_X = 500; // 绝对坐标
+    private static final int DEFAULT_USER_HOME_PAGE_SWIPE_END_Y_OFFSET = -400; // -400表示screenHeight-scrollDistance-400（负数表示从底部偏移）
+    private static final int DEFAULT_USER_HOME_PAGE_SWIPE_DURATION = 2000; // 2000毫秒
     
     private SharedPreferences preferences;
     
@@ -160,6 +182,164 @@ public class SettingsManager {
      */
     public void setClickProductLinkEnabled(boolean enabled) {
         preferences.edit().putBoolean(KEY_CLICK_PRODUCT_LINK, enabled).apply();
+    }
+    
+    /**
+     * 获取点击进入主页的按钮后需要等待的时间（毫秒）
+     */
+    public int getEnterHomePageWaitTime() {
+        return preferences.getInt(KEY_ENTER_HOME_PAGE_WAIT_TIME, DEFAULT_ENTER_HOME_PAGE_WAIT_TIME);
+    }
+    
+    /**
+     * 设置点击进入主页的按钮后需要等待的时间（毫秒）
+     */
+    public void setEnterHomePageWaitTime(int milliseconds) {
+        preferences.edit().putInt(KEY_ENTER_HOME_PAGE_WAIT_TIME, milliseconds).apply();
+    }
+    
+    // ==================== 搜索商品时滑动参数设置 ====================
+    
+    /**
+     * 获取搜索商品时滑动起始X坐标（0表示屏幕中心，正数表示绝对坐标）
+     */
+    public int getSearchProductSwipeStartX() {
+        return preferences.getInt(KEY_SEARCH_PRODUCT_SWIPE_START_X, DEFAULT_SEARCH_PRODUCT_SWIPE_START_X);
+    }
+    
+    /**
+     * 设置搜索商品时滑动起始X坐标（0表示屏幕中心，正数表示绝对坐标）
+     */
+    public void setSearchProductSwipeStartX(int x) {
+        preferences.edit().putInt(KEY_SEARCH_PRODUCT_SWIPE_START_X, x).apply();
+    }
+    
+    /**
+     * 获取搜索商品时滑动起始Y坐标（负数表示从屏幕底部偏移，正数表示绝对坐标）
+     */
+    public int getSearchProductSwipeStartY() {
+        return preferences.getInt(KEY_SEARCH_PRODUCT_SWIPE_START_Y, DEFAULT_SEARCH_PRODUCT_SWIPE_START_Y);
+    }
+    
+    /**
+     * 设置搜索商品时滑动起始Y坐标（负数表示从屏幕底部偏移，正数表示绝对坐标）
+     */
+    public void setSearchProductSwipeStartY(int y) {
+        preferences.edit().putInt(KEY_SEARCH_PRODUCT_SWIPE_START_Y, y).apply();
+    }
+    
+    /**
+     * 获取搜索商品时滑动结束X坐标（0表示屏幕中心，正数表示绝对坐标）
+     */
+    public int getSearchProductSwipeEndX() {
+        return preferences.getInt(KEY_SEARCH_PRODUCT_SWIPE_END_X, DEFAULT_SEARCH_PRODUCT_SWIPE_END_X);
+    }
+    
+    /**
+     * 设置搜索商品时滑动结束X坐标（0表示屏幕中心，正数表示绝对坐标）
+     */
+    public void setSearchProductSwipeEndX(int x) {
+        preferences.edit().putInt(KEY_SEARCH_PRODUCT_SWIPE_END_X, x).apply();
+    }
+    
+    /**
+     * 获取搜索商品时滑动结束Y偏移量（负数表示从屏幕底部偏移，用于计算结束Y坐标）
+     */
+    public int getSearchProductSwipeEndYOffset() {
+        return preferences.getInt(KEY_SEARCH_PRODUCT_SWIPE_END_Y_OFFSET, DEFAULT_SEARCH_PRODUCT_SWIPE_END_Y_OFFSET);
+    }
+    
+    /**
+     * 设置搜索商品时滑动结束Y偏移量（负数表示从屏幕底部偏移，用于计算结束Y坐标）
+     */
+    public void setSearchProductSwipeEndYOffset(int offset) {
+        preferences.edit().putInt(KEY_SEARCH_PRODUCT_SWIPE_END_Y_OFFSET, offset).apply();
+    }
+    
+    /**
+     * 获取搜索商品时滑动持续时间（毫秒）
+     */
+    public int getSearchProductSwipeDuration() {
+        return preferences.getInt(KEY_SEARCH_PRODUCT_SWIPE_DURATION, DEFAULT_SEARCH_PRODUCT_SWIPE_DURATION);
+    }
+    
+    /**
+     * 设置搜索商品时滑动持续时间（毫秒）
+     */
+    public void setSearchProductSwipeDuration(int duration) {
+        preferences.edit().putInt(KEY_SEARCH_PRODUCT_SWIPE_DURATION, duration).apply();
+    }
+    
+    // ==================== 用户主页滑动参数设置 ====================
+    
+    /**
+     * 获取用户主页滑动起始X坐标（正数表示绝对坐标）
+     */
+    public int getUserHomePageSwipeStartX() {
+        return preferences.getInt(KEY_USER_HOME_PAGE_SWIPE_START_X, DEFAULT_USER_HOME_PAGE_SWIPE_START_X);
+    }
+    
+    /**
+     * 设置用户主页滑动起始X坐标（正数表示绝对坐标）
+     */
+    public void setUserHomePageSwipeStartX(int x) {
+        preferences.edit().putInt(KEY_USER_HOME_PAGE_SWIPE_START_X, x).apply();
+    }
+    
+    /**
+     * 获取用户主页滑动起始Y坐标（负数表示从屏幕底部偏移，正数表示绝对坐标）
+     */
+    public int getUserHomePageSwipeStartY() {
+        return preferences.getInt(KEY_USER_HOME_PAGE_SWIPE_START_Y, DEFAULT_USER_HOME_PAGE_SWIPE_START_Y);
+    }
+    
+    /**
+     * 设置用户主页滑动起始Y坐标（负数表示从屏幕底部偏移，正数表示绝对坐标）
+     */
+    public void setUserHomePageSwipeStartY(int y) {
+        preferences.edit().putInt(KEY_USER_HOME_PAGE_SWIPE_START_Y, y).apply();
+    }
+    
+    /**
+     * 获取用户主页滑动结束X坐标（正数表示绝对坐标）
+     */
+    public int getUserHomePageSwipeEndX() {
+        return preferences.getInt(KEY_USER_HOME_PAGE_SWIPE_END_X, DEFAULT_USER_HOME_PAGE_SWIPE_END_X);
+    }
+    
+    /**
+     * 设置用户主页滑动结束X坐标（正数表示绝对坐标）
+     */
+    public void setUserHomePageSwipeEndX(int x) {
+        preferences.edit().putInt(KEY_USER_HOME_PAGE_SWIPE_END_X, x).apply();
+    }
+    
+    /**
+     * 获取用户主页滑动结束Y偏移量（负数表示从屏幕底部偏移，用于动态计算结束Y坐标）
+     */
+    public int getUserHomePageSwipeEndYOffset() {
+        return preferences.getInt(KEY_USER_HOME_PAGE_SWIPE_END_Y_OFFSET, DEFAULT_USER_HOME_PAGE_SWIPE_END_Y_OFFSET);
+    }
+    
+    /**
+     * 设置用户主页滑动结束Y偏移量（负数表示从屏幕底部偏移，用于动态计算结束Y坐标）
+     */
+    public void setUserHomePageSwipeEndYOffset(int offset) {
+        preferences.edit().putInt(KEY_USER_HOME_PAGE_SWIPE_END_Y_OFFSET, offset).apply();
+    }
+    
+    /**
+     * 获取用户主页滑动持续时间（毫秒）
+     */
+    public int getUserHomePageSwipeDuration() {
+        return preferences.getInt(KEY_USER_HOME_PAGE_SWIPE_DURATION, DEFAULT_USER_HOME_PAGE_SWIPE_DURATION);
+    }
+    
+    /**
+     * 设置用户主页滑动持续时间（毫秒）
+     */
+    public void setUserHomePageSwipeDuration(int duration) {
+        preferences.edit().putInt(KEY_USER_HOME_PAGE_SWIPE_DURATION, duration).apply();
     }
 }
 

@@ -42,6 +42,20 @@
             android:inputType="number"
             android:layout_marginBottom="12dp" />
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="点击进入主页的按钮后需要等待多少秒"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/et_enter_home_page_wait_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="例如：2 表示2秒"
+            android:inputType="number"
+            android:layout_marginBottom="12dp" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -230,6 +244,238 @@
                 android:layout_weight="2"
                 android:hint="0.5"
                 android:inputType="numberDecimal" />
+        </LinearLayout>
+
+        <!-- 搜索商品时滑动参数 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="搜索商品时滑动参数设置"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="说明：X坐标填0表示屏幕中心，Y坐标填负数表示从底部偏移（如-400表示screenHeight-400）"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_search_product_swipe_start_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="0 (屏幕中心)"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始Y:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_search_product_swipe_start_y"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="-400"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_search_product_swipe_end_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="0 (屏幕中心)"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束Y偏移:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_search_product_swipe_end_y_offset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="-400"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="持续时间(毫秒):"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_search_product_swipe_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="2000"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <!-- 用户主页滑动参数 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="用户主页滑动参数设置"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="说明：X坐标填绝对坐标值，Y坐标填负数表示从底部偏移（如-400表示screenHeight-400），结束Y由代码动态计算"
+            android:textSize="12sp"
+            android:textColor="#666666"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_user_home_page_swipe_start_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="500"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="起始Y:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_user_home_page_swipe_start_y"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="-400"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="8dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束X:"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_user_home_page_swipe_end_x"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="500"
+                android:inputType="number" />
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="结束Y偏移:"
+                android:textSize="14sp"
+                android:layout_marginStart="8dp" />
+            
+            <EditText
+                android:id="@+id/et_user_home_page_swipe_end_y_offset"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="-400"
+                android:inputType="number" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+            
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="持续时间(毫秒):"
+                android:textSize="14sp" />
+            
+            <EditText
+                android:id="@+id/et_user_home_page_swipe_duration"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:hint="2000"
+                android:inputType="number" />
         </LinearLayout>
 
         <!-- 说明 -->

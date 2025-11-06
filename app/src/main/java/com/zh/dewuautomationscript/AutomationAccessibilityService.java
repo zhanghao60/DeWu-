@@ -39,20 +39,28 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+
 /**
  * 自动化无障碍服务类
  * 提供点击、滑动等自动化功能
  * 继承安卓原生AccessibilityService类，实现自动化功能
  */
 public class AutomationAccessibilityService extends AccessibilityService {
+    // 单例模式，保证全局唯一实例
     private static AutomationAccessibilityService instance;
+    // 日志标签
     private static final String TAG = "AutomationService";
+    // 媒体投影管理器
     private MediaProjectionManager mediaProjectionManager;
+    // 媒体投影
     private MediaProjection mediaProjection;
+    // 窗口管理器
     private WindowManager windowManager;
+    // 显示指标
     private DisplayMetrics displayMetrics;
+    // 网络客户端
     private OkHttpClient httpClient;
-    
+    // 重写父类，生命周期方法
     @Override
     public void onCreate() {
         super.onCreate();
@@ -66,10 +74,8 @@ public class AutomationAccessibilityService extends AccessibilityService {
         httpClient = new OkHttpClient();
         Log.d(TAG, "无障碍服务已创建");
     }
-    
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        // 处理无障碍事件
     }
     @Override
     public void onInterrupt() {
@@ -163,7 +169,7 @@ public class AutomationAccessibilityService extends AccessibilityService {
         }
     }
 
-        
+    
     /**
      * 控件点击
      * @param element 目标控件
@@ -203,6 +209,32 @@ public class AutomationAccessibilityService extends AccessibilityService {
         }
     }
     
+    
+    /**
+     * 输入文本
+     * @param text 文本
+     * @param node 节点
+     * @return 是否成功
+     */
+    public static boolean InputText(String text, AccessibilityNodeInfo node) {
+        try {
+            if (node == null || text == null) {
+                Log.w(TAG, "输入文本失败：节点或文本为空");
+                return false;
+            }
+            
+            // 创建Bundle并设置文本参数
+            android.os.Bundle arguments = new android.os.Bundle();
+            arguments.putCharSequence(AccessibilityNodeInfo.ACTION_ARGUMENT_SET_TEXT_CHARSEQUENCE, text);
+            
+            // 执行设置文本操作
+            return node.performAction(AccessibilityNodeInfo.ACTION_SET_TEXT, arguments);
+        } catch (Exception e) {
+            Log.e(TAG, "输入文本失败", e);
+            return false;
+        }
+    }
+
 
     /**
      * 滑动操作
@@ -284,15 +316,55 @@ public class AutomationAccessibilityService extends AccessibilityService {
 
 
     /**
-     * 等待指定时间
+     * 等待指定时间（支持暂停中断和脚本停止）
+     * 这个方法会分段等待，可以响应暂停状态和脚本停止
      * @param milliseconds 毫秒数
      */
     public static void Sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Log.e(TAG, "Sleep被中断", e);
-            Thread.currentThread().interrupt();
+        if (milliseconds <= 0) {
+            return;
+        }
+        
+        long startTime = System.currentTimeMillis();
+        long remainingTime = milliseconds;
+        long checkInterval = 100; // 每100ms检查一次暂停状态和脚本运行状态
+        
+        while (remainingTime > 0) {
+            // 检查脚本是否被停止
+            if (!AutomationScriptExecutor.isScriptRunningStatic()) {
+                Log.d(TAG, "脚本已停止，退出Sleep");
+                break;
+            }
+            
+            // 检查线程是否被中断
+            if (Thread.currentThread().isInterrupted()) {
+                Log.d(TAG, "线程被中断，退出Sleep");
+                break;
+            }
+            
+            // 检查是否暂停，如果暂停则等待恢复
+            FloatingWindowService.waitIfPaused();
+            
+            // 再次检查脚本是否被停止（可能在waitIfPaused期间被停止）
+            if (!AutomationScriptExecutor.isScriptRunningStatic()) {
+                Log.d(TAG, "脚本已停止，退出Sleep");
+                break;
+            }
+            
+            // 计算本次等待的时间（不超过剩余时间和检查间隔）
+            long sleepTime = Math.min(remainingTime, checkInterval);
+            
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException e) {
+                Log.d(TAG, "Sleep被中断");
+                Thread.currentThread().interrupt();
+                break;
+            }
+            
+            // 更新剩余时间
+            long elapsed = System.currentTimeMillis() - startTime;
+            remainingTime = milliseconds - elapsed;
         }
     }
     
@@ -442,4 +514,7 @@ public class AutomationAccessibilityService extends AccessibilityService {
         }
         elements.clear();
     }
+
+
+
 }

@@ -24,7 +24,8 @@ import java.util.List;
 
 public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.OnUrlActionListener {
     
-    private TextInputEditText etUrlInput;
+    private TextInputEditText etProductTitle;
+    private TextInputEditText etPublisher;
     private Button btnAddUrl;
     private Button btnImportFromFile;
     private Button btnSaveToFile;
@@ -53,7 +54,8 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
     }
 
     private void initViews() {
-        etUrlInput = findViewById(R.id.etUrlInput);
+        etProductTitle = findViewById(R.id.etProductTitle);
+        etPublisher = findViewById(R.id.etPublisher);
         btnAddUrl = findViewById(R.id.btnAddUrl);
         btnImportFromFile = findViewById(R.id.btnImportFromFile);
         btnSaveToFile = findViewById(R.id.btnSaveToFile);
@@ -94,79 +96,44 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
     }
 
     private void addUrl() {
-        String urlText = etUrlInput.getText().toString().trim();
+        String productTitle = etProductTitle.getText().toString().trim();
+        String publisher = etPublisher.getText().toString().trim();
         
-        if (TextUtils.isEmpty(urlText)) {
-            Toast.makeText(this, "请输入链接地址", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(productTitle)) {
+            Toast.makeText(this, "请输入商品标题", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 简单的URL验证
-        if (!isValidUrl(urlText)) {
-            Toast.makeText(this, "请输入有效的链接地址", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(publisher)) {
+            Toast.makeText(this, "请输入发布人", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // 确保URL有协议前缀（支持得物深度链接）
-        if (!urlText.startsWith("http://") && !urlText.startsWith("https://") && !urlText.startsWith("dewulink://")) {
-            urlText = "https://" + urlText;
-        }
-
-        // 创建URL项目
+        // 创建商品项目
         UrlItem urlItem = new UrlItem();
-        urlItem.setUrl(urlText);
-        urlItem.setTitle(extractTitleFromUrl(urlText));
+        urlItem.setTitle(productTitle);
+        urlItem.setPublisher(publisher);
 
-        // 检查是否已存在
-        if (isUrlExists(urlText)) {
-            Toast.makeText(this, "该链接已存在", Toast.LENGTH_SHORT).show();
+        // 检查是否已存在（基于标题和发布人的组合）
+        if (isItemExists(productTitle, publisher)) {
+            Toast.makeText(this, "该商品已存在", Toast.LENGTH_SHORT).show();
             return;
         }
 
         urlList.add(urlItem);
         urlAdapter.notifyItemInserted(urlList.size() - 1);
-        etUrlInput.setText("");
+        etProductTitle.setText("");
+        etPublisher.setText("");
         updateUrlCount();
         updateEmptyState();
         
-        showStatus("链接已添加");
+        showStatus("商品已添加");
     }
 
-    private boolean isValidUrl(String url) {
-        // 支持得物深度链接
-        if (url.startsWith("dewulink://")) {
-            return true;
-        }
-        // 支持普通HTTP/HTTPS链接
-        return url.contains(".") && (url.contains("http") || url.startsWith("www.") || 
-                url.matches("^[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"));
-    }
-
-    private String extractTitleFromUrl(String url) {
-        try {
-            // 处理得物深度链接
-            if (url.startsWith("dewulink://")) {
-                return "得物深度链接";
-            }
-            
-            // 处理普通HTTP/HTTPS链接
-            if (url.startsWith("http://")) {
-                url = url.substring(7);
-            } else if (url.startsWith("https://")) {
-                url = url.substring(8);
-            }
-            if (url.contains("/")) {
-                url = url.substring(0, url.indexOf("/"));
-            }
-            return url;
-        } catch (Exception e) {
-            return url;
-        }
-    }
-
-    private boolean isUrlExists(String url) {
+    private boolean isItemExists(String title, String publisher) {
         for (UrlItem item : urlList) {
-            if (item.getUrl().equals(url)) {
+            if (item.getTitle() != null && item.getTitle().equals(title) &&
+                item.getPublisher() != null && item.getPublisher().equals(publisher)) {
                 return true;
             }
         }
@@ -175,14 +142,14 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
 
     private void saveUrlsToFile() {
         if (urlList.isEmpty()) {
-            Toast.makeText(this, "没有链接需要保存", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "没有商品需要保存", Toast.LENGTH_SHORT).show();
             return;
         }
 
         boolean success = jsonFileManager.saveUrlsToFile(urlList);
         if (success) {
-            showStatus("已保存 " + urlList.size() + " 个链接到文件");
-            Toast.makeText(this, "链接保存成功", Toast.LENGTH_SHORT).show();
+            showStatus("已保存 " + urlList.size() + " 个商品到文件");
+            Toast.makeText(this, "商品保存成功", Toast.LENGTH_SHORT).show();
         } else {
             showStatus("保存失败");
             Toast.makeText(this, "保存失败，请重试", Toast.LENGTH_SHORT).show();
@@ -198,9 +165,9 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
         updateEmptyState();
         
         if (!loadedUrls.isEmpty()) {
-            showStatus("已加载 " + loadedUrls.size() + " 个链接");
+            showStatus("已加载 " + loadedUrls.size() + " 个商品");
         } else {
-            showStatus("文件中没有保存的链接");
+            showStatus("文件中没有保存的商品");
         }
     }
 
@@ -226,13 +193,13 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
         builder.setView(dialogView);
 
         TextInputEditText etEditTitle = dialogView.findViewById(R.id.etEditTitle);
-        TextInputEditText etEditUrl = dialogView.findViewById(R.id.etEditUrl);
+        TextInputEditText etEditPublisher = dialogView.findViewById(R.id.etEditPublisher);
         Button btnCancelEdit = dialogView.findViewById(R.id.btnCancelEdit);
         Button btnSaveEdit = dialogView.findViewById(R.id.btnSaveEdit);
 
         // 设置当前值
         etEditTitle.setText(urlItem.getTitle());
-        etEditUrl.setText(urlItem.getUrl());
+        etEditPublisher.setText(urlItem.getPublisher());
 
         AlertDialog dialog = builder.create();
 
@@ -240,43 +207,40 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
 
         btnSaveEdit.setOnClickListener(v -> {
             String newTitle = etEditTitle.getText().toString().trim();
-            String newUrl = etEditUrl.getText().toString().trim();
+            String newPublisher = etEditPublisher.getText().toString().trim();
 
-            if (TextUtils.isEmpty(newUrl)) {
-                Toast.makeText(this, "请输入链接地址", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(newTitle)) {
+                Toast.makeText(this, "请输入商品标题", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!isValidUrl(newUrl)) {
-                Toast.makeText(this, "请输入有效的链接地址", Toast.LENGTH_SHORT).show();
+            if (TextUtils.isEmpty(newPublisher)) {
+                Toast.makeText(this, "请输入发布人", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // 确保URL有协议前缀（支持得物深度链接）
-            if (!newUrl.startsWith("http://") && !newUrl.startsWith("https://") && !newUrl.startsWith("dewulink://")) {
-                newUrl = "https://" + newUrl;
-            }
-
-            // 检查是否与其他链接重复
+            // 检查是否与其他商品重复
             boolean isDuplicate = false;
             for (int i = 0; i < urlList.size(); i++) {
-                if (i != position && urlList.get(i).getUrl().equals(newUrl)) {
+                if (i != position && 
+                    urlList.get(i).getTitle() != null && urlList.get(i).getTitle().equals(newTitle) &&
+                    urlList.get(i).getPublisher() != null && urlList.get(i).getPublisher().equals(newPublisher)) {
                     isDuplicate = true;
                     break;
                 }
             }
 
             if (isDuplicate) {
-                Toast.makeText(this, "该链接已存在", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "该商品已存在", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // 更新链接信息
-            urlItem.setTitle(newTitle.isEmpty() ? null : newTitle);
-            urlItem.setUrl(newUrl);
+            // 更新商品信息
+            urlItem.setTitle(newTitle);
+            urlItem.setPublisher(newPublisher);
             urlAdapter.notifyItemChanged(position);
             dialog.dismiss();
-            showStatus("链接已更新");
+            showStatus("商品已更新");
         });
 
         dialog.show();
@@ -385,33 +349,33 @@ public class UrlManagerActivity extends AppCompatActivity implements UrlAdapter.
     private void showImportConfirmDialog(List<UrlItem> importedUrls) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("确认导入");
-        builder.setMessage("将导入 " + importedUrls.size() + " 个链接\n\n是否要替换当前所有链接？");
+        builder.setMessage("将导入 " + importedUrls.size() + " 个商品\n\n是否要替换当前所有商品？");
         
         builder.setPositiveButton("替换", (dialog, which) -> {
-            // 替换所有链接
+            // 替换所有商品
             urlList.clear();
             urlList.addAll(importedUrls);
             urlAdapter.notifyDataSetChanged();
             updateUrlCount();
             updateEmptyState();
-            showStatus("已导入 " + importedUrls.size() + " 个链接");
+            showStatus("已导入 " + importedUrls.size() + " 个商品");
             Toast.makeText(this, "导入成功", Toast.LENGTH_SHORT).show();
         });
         
         builder.setNegativeButton("追加", (dialog, which) -> {
-            // 追加链接（去重）
+            // 追加商品（去重）
             int addedCount = 0;
-            for (UrlItem importedUrl : importedUrls) {
-                if (!isUrlExists(importedUrl.getUrl())) {
-                    urlList.add(importedUrl);
+            for (UrlItem importedItem : importedUrls) {
+                if (!isItemExists(importedItem.getTitle(), importedItem.getPublisher())) {
+                    urlList.add(importedItem);
                     addedCount++;
                 }
             }
             urlAdapter.notifyDataSetChanged();
             updateUrlCount();
             updateEmptyState();
-            showStatus("已追加 " + addedCount + " 个新链接");
-            Toast.makeText(this, "追加了 " + addedCount + " 个新链接", Toast.LENGTH_SHORT).show();
+            showStatus("已追加 " + addedCount + " 个新商品");
+            Toast.makeText(this, "追加了 " + addedCount + " 个新商品", Toast.LENGTH_SHORT).show();
         });
         
         builder.setNeutralButton("取消", null);

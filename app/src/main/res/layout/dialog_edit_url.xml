@@ -42,10 +42,10 @@
         app:hintTextColor="@color/primary_blue">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/etEditUrl"
+            android:id="@+id/etEditPublisher"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textUri"
+            android:inputType="text"
             android:textSize="16sp" />
 
     </com.google.android.material.textfield.TextInputLayout>

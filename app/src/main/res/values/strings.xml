@@ -11,21 +11,22 @@
     
     <!-- URL管理相关 -->
     <string name="url_manager_title">链接管理器</string>
-    <string name="url_manager_subtitle">添加和管理您的网页链接</string>
-    <string name="add_new_link">添加新链接</string>
-    <string name="url_input_hint">请输入网页链接</string>
-    <string name="add_link_button">添加链接</string>
-    <string name="saved_links">已保存的链接</string>
-    <string name="empty_links_message">暂无保存的链接\n点击上方按钮添加链接</string>
+    <string name="url_manager_subtitle">添加和管理商品信息</string>
+    <string name="add_new_link">添加新商品</string>
+    <string name="product_title_hint">商品标题</string>
+    <string name="publisher_hint">发布人</string>
+    <string name="add_link_button">添加商品</string>
+    <string name="saved_links">已保存的商品</string>
+    <string name="empty_links_message">暂无保存的商品\n点击上方按钮添加商品</string>
     <string name="save_to_file">保存到文件</string>
     <string name="load_from_file">从文件加载</string>
     <string name="import_from_file">导入JSON文件</string>
-    <string name="edit_url">编辑链接</string>
+    <string name="edit_url">编辑商品</string>
     <string name="save_changes">保存修改</string>
     <string name="cancel_edit">取消编辑</string>
-    <string name="edit_url_title">编辑链接</string>
-    <string name="url_title_hint">链接标题（可选）</string>
-    <string name="url_address_hint">链接地址</string>
+    <string name="edit_url_title">编辑商品</string>
+    <string name="url_title_hint">商品标题</string>
+    <string name="url_address_hint">发布人</string>
     
     <!-- 帮助文档相关 -->
     <string name="help_title">使用说明</string>

@@ -1,13 +1,10 @@
 package com.zh.dewuautomationscript;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -52,7 +49,6 @@ public class UrlAdapter extends RecyclerView.Adapter<UrlAdapter.UrlViewHolder> {
         private TextView tvUrlTitle;
         private TextView tvUrlAddress;
         private ImageButton btnEditUrl;
-        private ImageButton btnOpenUrl;
         private ImageButton btnDeleteUrl;
 
         public UrlViewHolder(@NonNull View itemView) {
@@ -60,59 +56,37 @@ public class UrlAdapter extends RecyclerView.Adapter<UrlAdapter.UrlViewHolder> {
             tvUrlTitle = itemView.findViewById(R.id.tvUrlTitle);
             tvUrlAddress = itemView.findViewById(R.id.tvUrlAddress);
             btnEditUrl = itemView.findViewById(R.id.btnEditUrl);
-            btnOpenUrl = itemView.findViewById(R.id.btnOpenUrl);
             btnDeleteUrl = itemView.findViewById(R.id.btnDeleteUrl);
         }
 
         public void bind(UrlItem urlItem, int position) {
-            // 设置标题，如果没有标题则使用URL
+            // 设置商品标题
             String title = urlItem.getTitle();
             if (title == null || title.trim().isEmpty()) {
-                title = extractDomainFromUrl(urlItem.getUrl());
+                title = "未命名商品";
             }
             tvUrlTitle.setText(title);
-            tvUrlAddress.setText(urlItem.getUrl());
+            
+            // 设置发布人
+            String publisher = urlItem.getPublisher();
+            if (publisher == null || publisher.trim().isEmpty()) {
+                publisher = "未知发布人";
+            }
+            tvUrlAddress.setText("发布人: " + publisher);
 
-            // 编辑链接按钮
+            // 编辑商品按钮
             btnEditUrl.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onEditUrl(position, urlItem);
                 }
             });
 
-            // 打开链接按钮
-            btnOpenUrl.setOnClickListener(v -> {
-                try {
-                    Intent intent = new Intent(Intent.ACTION_VIEW);
-                    intent.setData(Uri.parse(urlItem.getUrl()));
-                    itemView.getContext().startActivity(intent);
-                } catch (Exception e) {
-                    Toast.makeText(itemView.getContext(), "无法打开链接", Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            // 删除链接按钮
+            // 删除商品按钮
             btnDeleteUrl.setOnClickListener(v -> {
                 if (listener != null) {
                     listener.onDeleteUrl(position);
                 }
             });
-        }
-
-        private String extractDomainFromUrl(String url) {
-            try {
-                if (url.startsWith("http://")) {
-                    url = url.substring(7);
-                } else if (url.startsWith("https://")) {
-                    url = url.substring(8);
-                }
-                if (url.contains("/")) {
-                    url = url.substring(0, url.indexOf("/"));
-                }
-                return url;
-            } catch (Exception e) {
-                return url;
-            }
         }
     }
 }

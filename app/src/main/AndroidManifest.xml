@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- 网络权限，用于打开链接 -->
@@ -7,6 +8,9 @@
     
     <!-- 无障碍服务权限 -->
     <uses-permission android:name="android.permission.BIND_ACCESSIBILITY_SERVICE" />
+
+    <!-- 杀死app的权限 -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
     
     <!-- 截屏权限 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -15,7 +19,7 @@
     <!-- Android 11+ 媒体权限 -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     
-    <!-- 系统窗口权限，用于悬浮窗 -->
+    <!-- 悬浮窗权限 -->
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     
     <!-- 前台服务权限 -->
@@ -25,7 +29,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     
     <!-- 查询所有包权限（Android 11+） -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" 
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
     <application
@@ -86,6 +91,4 @@
                 android:value="automation_script_keep_alive" />
         </service>
     </application>
-
-
 </manifest>
