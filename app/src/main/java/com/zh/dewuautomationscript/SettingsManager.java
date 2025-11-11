@@ -16,12 +16,15 @@ public class SettingsManager {
     private static final String KEY_SWIPE_END_X = "swipe_end_x";
     private static final String KEY_SWIPE_END_Y = "swipe_end_y";
     private static final String KEY_SWIPE_DURATION = "swipe_duration";
+    private static final String KEY_SWIPE_COUNT = "swipe_count"; // 点击后滑动次数
     private static final String KEY_CLICK_LOOP_COUNT = "click_loop_count"; // 控件重复点击次数
     private static final String KEY_SWIPE_WAIT_TIME = "swipe_wait_time"; // 向左滑动启动等待时间
     private static final String KEY_MAX_CONTROL_COUNT = "max_control_count"; // 最多操作控件数量
     private static final String KEY_DEWU_APP_WAIT_TIME = "dewu_app_wait_time"; // 点击启动得物app按钮后的等待时间
     private static final String KEY_CLICK_PRODUCT_LINK = "click_product_link"; // 是否点击商品链接
     private static final String KEY_ENTER_HOME_PAGE_WAIT_TIME = "enter_home_page_wait_time"; // 点击进入主页的按钮后需要等待多少秒
+    private static final String KEY_CLICK_TYPE = "click_type"; // 点击类型：0=综合，1=最新，2=最热
+    private static final String KEY_CLICK_TYPE_WAIT_TIME = "click_type_wait_time"; // 点击标签后等待时间（毫秒）
     private static final String KEY_SEARCH_PRODUCT_SWIPE_START_X = "search_product_swipe_start_x"; // 搜索商品时滑动起始X
     private static final String KEY_SEARCH_PRODUCT_SWIPE_START_Y = "search_product_swipe_start_y"; // 搜索商品时滑动起始Y
     private static final String KEY_SEARCH_PRODUCT_SWIPE_END_X = "search_product_swipe_end_x"; // 搜索商品时滑动结束X
@@ -40,12 +43,15 @@ public class SettingsManager {
     private static final int DEFAULT_SWIPE_END_X = 200;
     private static final int DEFAULT_SWIPE_END_Y = 1200;
     private static final int DEFAULT_SWIPE_DURATION = 300;
+    private static final int DEFAULT_SWIPE_COUNT = 1; // 默认滑动1次
     private static final int DEFAULT_CLICK_LOOP_COUNT = 5; // 5次
     private static final int DEFAULT_SWIPE_WAIT_TIME = 500; // 500毫秒
     private static final int DEFAULT_MAX_CONTROL_COUNT = 12; // 12个控件
     private static final int DEFAULT_DEWU_APP_WAIT_TIME = 3000; // 点击启动得物app按钮后等待3秒
     private static final boolean DEFAULT_CLICK_PRODUCT_LINK = false; // 默认不点击商品链接
     private static final int DEFAULT_ENTER_HOME_PAGE_WAIT_TIME = 2000; // 点击进入主页的按钮后等待2秒
+    private static final int DEFAULT_CLICK_TYPE = 0; // 默认点击综合（0=综合，1=最新，2=最热）
+    private static final int DEFAULT_CLICK_TYPE_WAIT_TIME = 1500; // 默认点击标签后等待1.5秒
     private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_START_X = 0; // 0表示屏幕中心（screenWidth/2）
     private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_START_Y = -400; // -400表示screenHeight-400（负数表示从底部偏移）
     private static final int DEFAULT_SEARCH_PRODUCT_SWIPE_END_X = 0; // 0表示屏幕中心（screenWidth/2）
@@ -117,6 +123,20 @@ public class SettingsManager {
     
     public void setSwipeDuration(int duration) {
         preferences.edit().putInt(KEY_SWIPE_DURATION, duration).apply();
+    }
+    
+    /**
+     * 获取点击后滑动次数
+     */
+    public int getSwipeCount() {
+        return preferences.getInt(KEY_SWIPE_COUNT, DEFAULT_SWIPE_COUNT);
+    }
+    
+    /**
+     * 设置点击后滑动次数
+     */
+    public void setSwipeCount(int count) {
+        preferences.edit().putInt(KEY_SWIPE_COUNT, count).apply();
     }
     
     public int getClickLoopCount() {
@@ -196,6 +216,34 @@ public class SettingsManager {
      */
     public void setEnterHomePageWaitTime(int milliseconds) {
         preferences.edit().putInt(KEY_ENTER_HOME_PAGE_WAIT_TIME, milliseconds).apply();
+    }
+    
+    /**
+     * 获取点击类型（0=综合，1=最新，2=最热）
+     */
+    public int getClickType() {
+        return preferences.getInt(KEY_CLICK_TYPE, DEFAULT_CLICK_TYPE);
+    }
+    
+    /**
+     * 设置点击类型（0=综合，1=最新，2=最热）
+     */
+    public void setClickType(int type) {
+        preferences.edit().putInt(KEY_CLICK_TYPE, type).apply();
+    }
+    
+    /**
+     * 获取点击标签后等待时间（毫秒）
+     */
+    public int getClickTypeWaitTime() {
+        return preferences.getInt(KEY_CLICK_TYPE_WAIT_TIME, DEFAULT_CLICK_TYPE_WAIT_TIME);
+    }
+    
+    /**
+     * 设置点击标签后等待时间（毫秒）
+     */
+    public void setClickTypeWaitTime(int milliseconds) {
+        preferences.edit().putInt(KEY_CLICK_TYPE_WAIT_TIME, milliseconds).apply();
     }
     
     // ==================== 搜索商品时滑动参数设置 ====================

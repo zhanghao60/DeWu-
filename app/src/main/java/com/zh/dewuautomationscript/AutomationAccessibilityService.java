@@ -316,8 +316,9 @@ public class AutomationAccessibilityService extends AccessibilityService {
 
 
     /**
-     * 等待指定时间（支持暂停中断和脚本停止）
-     * 这个方法会分段等待，可以响应暂停状态和脚本停止
+     * 等待指定时间（支持真正的线程暂停）
+     * 这个方法会分段等待，可以响应暂停状态
+     * 暂停时线程会被真正阻塞，直到恢复
      * @param milliseconds 毫秒数
      */
     public static void Sleep(long milliseconds) {
@@ -327,29 +328,17 @@ public class AutomationAccessibilityService extends AccessibilityService {
         
         long startTime = System.currentTimeMillis();
         long remainingTime = milliseconds;
-        long checkInterval = 100; // 每100ms检查一次暂停状态和脚本运行状态
+        long checkInterval = 100; // 每100ms检查一次暂停状态
         
         while (remainingTime > 0) {
-            // 检查脚本是否被停止
-            if (!AutomationScriptExecutor.isScriptRunningStatic()) {
-                Log.d(TAG, "脚本已停止，退出Sleep");
-                break;
-            }
-            
-            // 检查线程是否被中断
+            // 检查线程是否被中断（这是Java线程机制，不是检查点）
             if (Thread.currentThread().isInterrupted()) {
                 Log.d(TAG, "线程被中断，退出Sleep");
                 break;
             }
             
-            // 检查是否暂停，如果暂停则等待恢复
+            // 如果暂停，线程会被真正阻塞在这里，直到恢复
             FloatingWindowService.waitIfPaused();
-            
-            // 再次检查脚本是否被停止（可能在waitIfPaused期间被停止）
-            if (!AutomationScriptExecutor.isScriptRunningStatic()) {
-                Log.d(TAG, "脚本已停止，退出Sleep");
-                break;
-            }
             
             // 计算本次等待的时间（不超过剩余时间和检查间隔）
             long sleepTime = Math.min(remainingTime, checkInterval);

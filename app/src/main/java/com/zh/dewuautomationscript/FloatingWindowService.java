@@ -293,28 +293,16 @@ public class FloatingWindowService extends Service {
     }
     
     /**
-     * 等待直到不暂停（使用真正的线程阻塞，而不是轮询）
-     * 这个方法会阻塞当前线程，直到脚本恢复执行或脚本被停止
+     * 等待直到不暂停（使用真正的线程阻塞）
+     * 这个方法会阻塞当前线程，直到脚本恢复执行
+     * 纯粹的线程暂停机制，不包含任何检查逻辑
      */
     public static void waitIfPaused() {
         synchronized (pauseLock) {
             while (isPaused) {
-                // 检查脚本是否被停止，如果停止则立即退出
-                if (!AutomationScriptExecutor.isScriptRunningStatic()) {
-                    Log.d(TAG, "脚本已停止，退出waitIfPaused");
-                    break;
-                }
-                
-                // 检查线程是否被中断
-                if (Thread.currentThread().isInterrupted()) {
-                    Log.d(TAG, "线程被中断，退出waitIfPaused");
-                    break;
-                }
-                
                 try {
-                    // 使用 wait() 真正阻塞线程，而不是轮询
-                    // 设置超时，以便定期检查脚本运行状态
-                    pauseLock.wait(100); // 每100ms检查一次
+                    // 使用 wait() 真正阻塞线程，等待恢复通知
+                    pauseLock.wait();
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     Log.d(TAG, "等待被中断");

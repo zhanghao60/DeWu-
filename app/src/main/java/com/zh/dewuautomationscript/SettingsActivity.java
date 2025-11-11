@@ -2,6 +2,7 @@ package com.zh.dewuautomationscript;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -16,7 +17,9 @@ public class SettingsActivity extends AppCompatActivity {
     
     private EditText etDewuAppWaitTime, etClickLoopCount, etMaxControlCount, etEnterHomePageWaitTime;
     private CheckBox cbEnableScroll, cbClickProductLink;
-    private EditText etSwipeStartX, etSwipeStartY, etSwipeEndX, etSwipeEndY, etSwipeDuration, etSwipeWaitTime;
+    private Spinner spClickType;
+    private EditText etClickTypeWaitTime;
+    private EditText etSwipeStartX, etSwipeStartY, etSwipeEndX, etSwipeEndY, etSwipeDuration, etSwipeWaitTime, etSwipeCount;
     private EditText etSearchProductSwipeStartX, etSearchProductSwipeStartY, etSearchProductSwipeEndX, etSearchProductSwipeEndYOffset, etSearchProductSwipeDuration;
     private EditText etUserHomePageSwipeStartX, etUserHomePageSwipeStartY, etUserHomePageSwipeEndX, etUserHomePageSwipeEndYOffset, etUserHomePageSwipeDuration;
     private Button btnSave;
@@ -31,6 +34,7 @@ public class SettingsActivity extends AppCompatActivity {
         settingsManager = new SettingsManager(this);
         
         initViews();
+        initClickTypeSpinner();
         loadSettings();
         setListeners();
     }
@@ -42,12 +46,15 @@ public class SettingsActivity extends AppCompatActivity {
         etMaxControlCount = findViewById(R.id.et_max_control_count);
         cbEnableScroll = findViewById(R.id.cb_enable_scroll);
         cbClickProductLink = findViewById(R.id.cb_click_product_link);
+        spClickType = findViewById(R.id.sp_click_type);
+        etClickTypeWaitTime = findViewById(R.id.et_click_type_wait_time);
         etSwipeStartX = findViewById(R.id.et_swipe_start_x);
         etSwipeStartY = findViewById(R.id.et_swipe_start_y);
         etSwipeEndX = findViewById(R.id.et_swipe_end_x);
         etSwipeEndY = findViewById(R.id.et_swipe_end_y);
         etSwipeDuration = findViewById(R.id.et_swipe_duration);
         etSwipeWaitTime = findViewById(R.id.et_swipe_wait_time);
+        etSwipeCount = findViewById(R.id.et_swipe_count);
         etSearchProductSwipeStartX = findViewById(R.id.et_search_product_swipe_start_x);
         etSearchProductSwipeStartY = findViewById(R.id.et_search_product_swipe_start_y);
         etSearchProductSwipeEndX = findViewById(R.id.et_search_product_swipe_end_x);
@@ -59,6 +66,14 @@ public class SettingsActivity extends AppCompatActivity {
         etUserHomePageSwipeEndYOffset = findViewById(R.id.et_user_home_page_swipe_end_y_offset);
         etUserHomePageSwipeDuration = findViewById(R.id.et_user_home_page_swipe_duration);
         btnSave = findViewById(R.id.btn_save_settings);
+    }
+    
+    private void initClickTypeSpinner() {
+        // 初始化点击类型下拉列表
+        String[] clickTypes = {"综合", "最新", "最热"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, clickTypes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spClickType.setAdapter(adapter);
     }
     
     private void loadSettings() {
@@ -75,6 +90,9 @@ public class SettingsActivity extends AppCompatActivity {
         int swipeEndY = settingsManager.getSwipeEndY();
         int swipeDuration = settingsManager.getSwipeDuration();
         int swipeWaitTime = settingsManager.getSwipeWaitTime();
+        int swipeCount = settingsManager.getSwipeCount();
+        int clickType = settingsManager.getClickType();
+        int clickTypeWaitTime = settingsManager.getClickTypeWaitTime();
         int searchProductSwipeStartX = settingsManager.getSearchProductSwipeStartX();
         int searchProductSwipeStartY = settingsManager.getSearchProductSwipeStartY();
         int searchProductSwipeEndX = settingsManager.getSearchProductSwipeEndX();
@@ -98,6 +116,9 @@ public class SettingsActivity extends AppCompatActivity {
         etSwipeEndY.setText(String.valueOf(swipeEndY));
         etSwipeDuration.setText(String.valueOf(swipeDuration / 1000.0)); // 转换为秒显示
         etSwipeWaitTime.setText(String.valueOf(swipeWaitTime / 1000.0)); // 转换为秒显示
+        etSwipeCount.setText(String.valueOf(swipeCount));
+        spClickType.setSelection(clickType); // 设置点击类型选择
+        etClickTypeWaitTime.setText(String.valueOf(clickTypeWaitTime / 1000.0)); // 转换为秒显示
         etSearchProductSwipeStartX.setText(String.valueOf(searchProductSwipeStartX));
         etSearchProductSwipeStartY.setText(String.valueOf(searchProductSwipeStartY));
         etSearchProductSwipeEndX.setText(String.valueOf(searchProductSwipeEndX));
@@ -167,6 +188,9 @@ public class SettingsActivity extends AppCompatActivity {
             boolean swipeAfterClick = cbEnableScroll.isChecked();
             boolean clickProductLink = cbClickProductLink.isChecked();
             
+            // 获取点击类型（0=综合，1=最新，2=最热）
+            int clickType = spClickType.getSelectedItemPosition();
+            double clickTypeWaitTime = parseDoubleOrDefault(etClickTypeWaitTime.getText().toString(), 1.5);
             
             // 获取滑动参数
             int swipeStartX = parseIntOrDefault(etSwipeStartX.getText().toString(), 800);
@@ -175,6 +199,7 @@ public class SettingsActivity extends AppCompatActivity {
             int swipeEndY = parseIntOrDefault(etSwipeEndY.getText().toString(), 1200);
             double swipeDuration = parseDoubleOrDefault(etSwipeDuration.getText().toString(), 0.3);
             double swipeWaitTime = parseDoubleOrDefault(etSwipeWaitTime.getText().toString(), 0.5);
+            int swipeCount = parseIntOrDefault(etSwipeCount.getText().toString(), 1);
             
             // 获取搜索商品时滑动参数
             int searchProductSwipeStartX = parseIntOrDefault(etSearchProductSwipeStartX.getText().toString(), 0);
@@ -201,6 +226,16 @@ public class SettingsActivity extends AppCompatActivity {
                 return;
             }
             
+            if (swipeCount < 1 || swipeCount > 10) {
+                Toast.makeText(this, "滑动次数应在 1-10 之间", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
+            if (clickTypeWaitTime < 0 || clickTypeWaitTime > 10) {
+                Toast.makeText(this, "点击标签后等待时间应在 0-10 秒之间", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            
             if (searchProductSwipeDuration < 100 || searchProductSwipeDuration > 10000) {
                 Toast.makeText(this, "搜索商品时滑动持续时间应在 100-10000 毫秒之间", Toast.LENGTH_SHORT).show();
                 return;
@@ -218,12 +253,15 @@ public class SettingsActivity extends AppCompatActivity {
             settingsManager.setMaxControlCount(maxControlCount);
             settingsManager.setSwipeAfterClickEnabled(swipeAfterClick);
             settingsManager.setClickProductLinkEnabled(clickProductLink);
+            settingsManager.setClickType(clickType);
+            settingsManager.setClickTypeWaitTime((int)(clickTypeWaitTime * 1000)); // 转换为毫秒
             settingsManager.setSwipeStartX(swipeStartX);
             settingsManager.setSwipeStartY(swipeStartY);
             settingsManager.setSwipeEndX(swipeEndX);
             settingsManager.setSwipeEndY(swipeEndY);
             settingsManager.setSwipeDuration((int)(swipeDuration * 1000)); // 转换为毫秒
             settingsManager.setSwipeWaitTime((int)(swipeWaitTime * 1000)); // 转换为毫秒
+            settingsManager.setSwipeCount(swipeCount);
             settingsManager.setSearchProductSwipeStartX(searchProductSwipeStartX);
             settingsManager.setSearchProductSwipeStartY(searchProductSwipeStartY);
             settingsManager.setSearchProductSwipeEndX(searchProductSwipeEndX);

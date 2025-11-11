@@ -101,11 +101,6 @@ public class AutomationScriptExecutor {
      */
     private void processDewuDeepLink(String url, ScriptCallback callback, boolean isLastUrl) {
         try {
-            // 检查脚本是否被停止
-            if (!isScriptRunning) {
-                Log.d(TAG, "脚本被停止，退出深度链接处理");
-                return;
-            }
             // 打印日志，开始处理得物app自动化操作
             Log.d(TAG, "开始得物app自动化操作");
             
@@ -156,18 +151,17 @@ public class AutomationScriptExecutor {
 
             // 循环：用于逐条处理URL列表，直到处理完所有URL
             for (int i = 0; i < urlList.size(); i++) {
-                // 检查线程/运行状态
-                if (Thread.currentThread().isInterrupted() || !isScriptRunning) {
-                    Log.d(TAG, "脚本被停止或线程中断，提前结束URL处理");
+                // 检查线程中断（Java标准机制，不是检查点）
+                if (Thread.currentThread().isInterrupted()) {
+                    Log.d(TAG, "线程被中断，提前结束URL处理");
                     break;
                 }
 
                 UrlItem item = urlList.get(i);
                 Log.d(TAG, "开始处理第 " + (i + 1) + "/" + urlList.size() + " 条: 标题=" + item.getTitle() + " 发布人=" + item.getPublisher());
 
-                // 更新悬浮窗状态并检查暂停
+                // 更新悬浮窗状态
                 FloatingWindowService.updateService(context, "正在搜索商品，寻找主页，标题: " + item.getTitle());
-                FloatingWindowService.waitIfPaused();
 
                 FloatingWindowService.updateService(context, "点击得物主页的tabar");
                 // 点击得物主页的tabar
@@ -347,6 +341,10 @@ public class AutomationScriptExecutor {
                 AutomationAccessibilityService.Click(x, y, 100);
                 // 等待5秒
                 AutomationAccessibilityService.Sleep(5000);
+                // 从设置获取点击综合、最新、最热
+                int clickType = settingsManager.getClickType();
+                // 点击对应的标签
+                ClickType(clickType);
                 // 执行滚动屏幕，直到找到符合条件的商品
                 ScrollScreen(title, publisher);
             } else {
@@ -357,6 +355,64 @@ public class AutomationScriptExecutor {
         }
     }
 
+    // 点击对应的标签
+    private void ClickType(int clickType) {
+        try {
+            // 点击对应的标签
+            Log.d(TAG, "点击对应的标签: " + clickType);
+            String tagName = "";
+            String tagId = "";
+            
+            // 根据点击类型选择对应的标签
+            if (clickType == 0) {
+                tagName = "综合";
+                tagId = "com.shizhuang.duapp:id/tv_tag_sum";
+            } else if (clickType == 1) {
+                tagName = "最新";
+                tagId = "com.shizhuang.duapp:id/tv_tag_new";
+            } else if (clickType == 2) {
+                tagName = "最热";
+                tagId = "com.shizhuang.duapp:id/tv_tag_hot";
+            }
+            
+            if (!tagId.isEmpty()) {
+                Log.d(TAG, "点击" + tagName);
+                FloatingWindowService.updateService(context, "点击" + tagName);
+                Clickbtn(tagId);
+                
+                // 从设置获取点击标签之后等待的时间
+                int clickTypeWaitTime = settingsManager.getClickTypeWaitTime();
+                AutomationAccessibilityService.Sleep(clickTypeWaitTime);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, "点击对应的标签失败", e);
+            FloatingWindowService.updateService(context, "点击对应的标签失败: " + e.getMessage());
+        }
+    }
+
+    // 执行点击按钮操作
+    private  void Clickbtn(String id){
+        // 获取所有节点
+        List<AccessibilityNodeInfo> allElements = AutomationAccessibilityService.GetAllElements();
+        if (allElements == null || allElements.isEmpty()) {
+            Log.w(TAG, "无法获取页面元素，可能页面未加载完成");
+            return;
+        }
+        // 获取对应的标签节点，通过id获取
+        List<AccessibilityNodeInfo> labelNodes = AutomationAccessibilityService.findElementListById(allElements, id);
+        if (labelNodes == null || labelNodes.isEmpty()) {
+            Log.w(TAG, "无法获取对应的标签节点");
+            return;
+        }
+        // 点击对应的标签（点击第一个找到的节点）
+        AccessibilityNodeInfo targetNode = labelNodes.get(0);
+        Rect bounds = new Rect();
+        targetNode.getBoundsInScreen(bounds);
+        AutomationAccessibilityService.Click(bounds.centerX(), bounds.centerY(), 100);
+        AutomationAccessibilityService.Sleep(1500);
+        Log.d(TAG, "点击对应的标签成功");
+        FloatingWindowService.updateService(context, "点击对应的标签成功");
+    }
 
     /**
      * 打开得物app
@@ -494,22 +550,12 @@ public class AutomationScriptExecutor {
                 
                 Log.d(TAG, "开始执行脚本，共 " + urlList.size() + " 个URL");
                 
-                // 检查线程是否被中断
+                // 检查线程中断（Java标准机制，不是检查点）
                 if (Thread.currentThread().isInterrupted()) {
-                    Log.d(TAG, "脚本线程被中断，退出执行");
+                    Log.d(TAG, "线程被中断，退出执行");
                     mainHandler.post(() -> callback.onScriptCompleted(true, "脚本已停止"));
                     return;
                 }
-                
-                // 检查脚本是否被停止
-                if (!isScriptRunning) {
-                    Log.d(TAG, "脚本被停止，退出执行");
-                    mainHandler.post(() -> callback.onScriptCompleted(true, "脚本已停止"));
-                    return;
-                }
-                
-                // 检查暂停状态
-                FloatingWindowService.waitIfPaused();
                 
                 // 2. 执行得物app自动化操作（从JSON文件读取数据）
                 Log.d(TAG, "开始执行得物app自动化操作");
@@ -543,8 +589,6 @@ public class AutomationScriptExecutor {
      */
     private void findAndOperateControls(String targetFullId) {
         try {
-            // 检查暂停状态
-            FloatingWindowService.waitIfPaused();
             //初始化文本列表，用于去重
             List<String> textList = new ArrayList<>();
             //初始化textViewNodes列表
@@ -563,20 +607,11 @@ public class AutomationScriptExecutor {
      * @return 是否找到控件
      */
     private void CircularSearchElements(List<AccessibilityNodeInfo> textViewNodes,List<String> textList) {
-            // 检查线程是否被中断
+            // 检查线程中断（Java标准机制，不是检查点）
             if (Thread.currentThread().isInterrupted()) {
-                Log.d(TAG, "脚本线程被中断，退出控件查找");
+                Log.d(TAG, "线程被中断，退出控件查找");
                 return;
             }
-            
-            // 检查脚本是否被停止
-            if (!isScriptRunning) {
-                Log.d(TAG, "脚本被停止，退出控件查找");
-                return;
-            }
-            
-            // 检查暂停状态
-            FloatingWindowService.waitIfPaused();
             
             //获取所有id为com.shizhuang.duapp:id/tvTitle的TextView节点
             Log.d(TAG, "=== 开始查找控件 ===");
@@ -621,6 +656,7 @@ public class AutomationScriptExecutor {
             
             //遍历textViewNodes，找到对应的Target节点
             int processedCount = 0; // 已处理的控件计数
+            int maxControlCount = settingsManager.getMaxControlCount(); // 从设置获取需要操作的控件数量
             
             // 筛选出不重复的控件
             List<AccessibilityNodeInfo> uniqueNodes = new ArrayList<>();
@@ -651,20 +687,11 @@ public class AutomationScriptExecutor {
             // 循环遍历控件，处理每个控件
             for (int nodeIndex = 0; nodeIndex < textViewNodes.size(); nodeIndex++) {
                 
-                // 检查线程是否被中断
+                // 检查线程中断（Java标准机制，不是检查点）
                 if (Thread.currentThread().isInterrupted()) {
-                    Log.d(TAG, "脚本线程被中断，退出控件处理");
+                    Log.d(TAG, "线程被中断，退出控件处理");
                     return;
                 }
-                
-                // 检查脚本是否被停止
-                if (!isScriptRunning) {
-                    Log.d(TAG, "脚本被停止，退出控件处理");
-                    return;
-                }
-                
-                // 检查暂停状态
-                FloatingWindowService.waitIfPaused();
                 
                 // 更新控件处理进度
                 FloatingWindowService.updateService(context, "正在处理第 " + (nodeIndex + 1) + "/" + textViewNodes.size() + " 个控件");
@@ -706,9 +733,6 @@ public class AutomationScriptExecutor {
                 
                 // 准备完成，开始执行控件操作
                 for (int i = 0; i < clickLoopCount; i++) {
-                    // 检查暂停状态
-                    FloatingWindowService.waitIfPaused();
-                    
                     FloatingWindowService.updateService(context, "第" + (nodeIndex + 1) + "/" + textViewNodes.size() + " 控件 第" + (i + 1) + "/" + clickLoopCount + "次点击");
                     
                     // 使用坐标点击
@@ -727,6 +751,12 @@ public class AutomationScriptExecutor {
                 //将文本添加到textList中
                 textList.add(nodeText);
                 processedCount++; // 增加已处理计数
+                // 检测是否达到最大操作控件数量
+                if (processedCount >= maxControlCount) {
+                    Log.d(TAG, "已经执行了 " + processedCount + " 个控件，达到最大操作控件数量，停止查找");
+                    FloatingWindowService.updateService(context, "达到最大操作控件数量(" + maxControlCount + ")，停止查找");
+                    return;
+                }
             }
             //判断当前已经执行了控件数目
             int currentControlCount = textList.size();
@@ -740,9 +770,6 @@ public class AutomationScriptExecutor {
             Log.d(TAG, "继续查找新控件");
             FloatingWindowService.updateService(context, "继续查找新控件... (已处理" + currentControlCount + "/" + settingsManager.getMaxControlCount() + ")");
             
-            // 检查暂停状态
-            FloatingWindowService.waitIfPaused();
-            
             CircularSearchElements(textViewNodes, textList);
     }
 
@@ -751,15 +778,9 @@ public class AutomationScriptExecutor {
      * 点击控件之后执行的操作
      */
     private void afterClickAction() {
-        // 检查线程是否被中断
+        // 检查线程中断（Java标准机制，不是检查点）
         if (Thread.currentThread().isInterrupted()) {
-            Log.d(TAG, "脚本线程被中断，退出点击后操作");
-            return;
-        }
-        
-        // 检查脚本是否被停止
-        if (!isScriptRunning) {
-            Log.d(TAG, "脚本被停止，退出点击后操作");
+            Log.d(TAG, "线程被中断，退出点击后操作");
             return;
         }
         
@@ -776,16 +797,21 @@ public class AutomationScriptExecutor {
             int swipeEndX = settingsManager.getSwipeEndX();
             int swipeEndY = settingsManager.getSwipeEndY();
             int swipeDuration = settingsManager.getSwipeDuration();
-            //滑动
-            FloatingWindowService.updateService(context, "执行滑动操作...");
-            AutomationAccessibilityService.Swipe(swipeStartX, swipeStartY, swipeEndX, swipeEndY, swipeDuration);
-            // Sleep 方法内部会自动检查暂停状态
-            AutomationAccessibilityService.Sleep(swipeDuration+2000);
+            int swipeCount = settingsManager.getSwipeCount(); // 获取滑动次数
             
-            // 滑动完成后立即检查脚本是否被停止
-            if (!isScriptRunning) {
-                Log.d(TAG, "脚本被停止，退出滑动后操作");
-                return;
+            // 执行多次滑动
+            for (int i = 0; i < swipeCount; i++) {
+                // 检查线程中断（Java标准机制，不是检查点）
+                if (Thread.currentThread().isInterrupted()) {
+                    Log.d(TAG, "线程被中断，退出滑动操作");
+                    return;
+                }
+                
+                //滑动
+                FloatingWindowService.updateService(context, "执行滑动操作 (" + (i + 1) + "/" + swipeCount + ")...");
+                AutomationAccessibilityService.Swipe(swipeStartX, swipeStartY, swipeEndX, swipeEndY, swipeDuration);
+                // Sleep 方法内部会自动处理暂停
+                AutomationAccessibilityService.Sleep(swipeDuration+2000);
             }
         } else {
             Log.d(TAG, "用户已禁用点击后滑动，跳过滑动操作");
@@ -829,9 +855,9 @@ public class AutomationScriptExecutor {
             }
         }
         
-        // 检查脚本是否被停止
-        if (!isScriptRunning) {
-            Log.d(TAG, "脚本被停止，退出返回操作");
+        // 检查线程中断（Java标准机制，不是检查点）
+        if (Thread.currentThread().isInterrupted()) {
+            Log.d(TAG, "线程被中断，退出返回操作");
             return;
         }
         
@@ -969,9 +995,9 @@ public class AutomationScriptExecutor {
             Log.d(TAG, "等待滚动完成");
             AutomationAccessibilityService.Sleep(2500);
             
-            // 检查线程是否被中断或脚本是否被停止
-            if (Thread.currentThread().isInterrupted() || !isScriptRunning) {
-                Log.d(TAG, "脚本被停止，返回最后坐标");
+            // 检查线程中断（Java标准机制，不是检查点）
+            if (Thread.currentThread().isInterrupted()) {
+                Log.d(TAG, "线程被中断，返回最后坐标");
                 return new int[]{x, y};
             }
             
@@ -1013,9 +1039,9 @@ public class AutomationScriptExecutor {
         try {
             // 循环：用于滚动屏幕，直到找到符合条件的商品
             while (true) {
-                // 检查脚本是否被停止
-                if (!isScriptRunning || Thread.currentThread().isInterrupted()) {
-                    Log.d(TAG, "脚本被停止或线程中断，退出滚动屏幕");
+                // 检查线程中断（Java标准机制，不是检查点）
+                if (Thread.currentThread().isInterrupted()) {
+                    Log.d(TAG, "线程被中断，退出滚动屏幕");
                     return false;
                 }
                 
@@ -1075,18 +1101,39 @@ public class AutomationScriptExecutor {
                                     String confirmUsername = confirmNode.getText() != null ? confirmNode.getText().toString() : "";
                                     if (confirmUsername.equals(publisher)) {
                                         Log.d(TAG, "找到用户按钮节点，点击用户按钮");
-                                        // 获取节点坐标
-                                        bounds = new Rect();
-                                        confirmNode.getBoundsInScreen(bounds);
-                                        x = (bounds.left + bounds.right) / 2;
-                                        y = (bounds.top + bounds.bottom) / 2;
-                                        Log.d(TAG, "节点坐标: " + x + ", " + y);
-                                        // 点击节点，坐标点击
-                                        AutomationAccessibilityService.Click(x, y, 100);
-                                        // 从配置当中获取等待时间,等待进入用户主页
-                                        int enterHomePageWaitTime = settingsManager.getEnterHomePageWaitTime();
-                                        AutomationAccessibilityService.Sleep(enterHomePageWaitTime);
-                                        //返回true，退出函数
+                                        // 保证目标按钮在临界范围内
+                                        guaranteeInCriticalRange(confirmNode, 600);
+                                        //获取最新的坐标信息，用于点击
+                                        Log.d(TAG, "获取最新的坐标信息，用于点击");
+                                        allElements = AutomationAccessibilityService.GetAllElements();
+                                        if (allElements == null || allElements.isEmpty()) {
+                                            Log.w(TAG, "无法获取页面元素，可能页面未加载完成");
+                                            return false;
+                                        }
+                                        usernameNodes = AutomationAccessibilityService.findElementListById(allElements, "com.shizhuang.duapp:id/tvUsername");
+                                        if (usernameNodes == null || usernameNodes.isEmpty()) {
+                                            Log.w(TAG, "无法获取id为com.shizhuang.duapp:id/tvUsername的节点");
+                                            return false;
+                                        }
+                                        for (AccessibilityNodeInfo node : usernameNodes) {
+                                            if (node == null) continue;
+                                            String text = node.getText() != null ? node.getText().toString() : "";
+                                            if (text.equals(publisher)) {
+                                                Log.d(TAG, "节点文本和publisher匹配成功");
+                                                bounds = new Rect();
+                                                node.getBoundsInScreen(bounds);
+                                                x = (bounds.left + bounds.right) / 2;
+                                                y = (bounds.top + bounds.bottom) / 2;
+                                                Log.d(TAG, "节点坐标: " + x + ", " + y);
+                                                // 点击节点，坐标点击
+                                                AutomationAccessibilityService.Click(x, y, 100);
+                                                // 从配置当中获取等待时间,等待进入用户主页
+                                                int enterHomePageWaitTime = settingsManager.getEnterHomePageWaitTime();
+                                                AutomationAccessibilityService.Sleep(enterHomePageWaitTime);
+                                                //返回true，退出函数
+                                                return true;
+                                            }
+                                        }
                                         return true;
                                     }
                                 }
@@ -1098,9 +1145,9 @@ public class AutomationScriptExecutor {
                         else {
                             Log.d(TAG, "节点坐标不在屏幕范围内,需要滚动屏幕,直到节点在屏幕范围内");
                             while (true) {
-                                // 检查脚本是否被停止
-                                if (!isScriptRunning || Thread.currentThread().isInterrupted()) {
-                                    Log.d(TAG, "脚本被停止或线程中断，退出内部滚动循环");
+                                // 检查线程中断（Java标准机制，不是检查点）
+                                if (Thread.currentThread().isInterrupted()) {
+                                    Log.d(TAG, "线程被中断，退出内部滚动循环");
                                     return false;
                                 }
                                 
@@ -1146,17 +1193,40 @@ public class AutomationScriptExecutor {
                                                         String confirmUsername = confirmNode.getText() != null ? confirmNode.getText().toString() : "";
                                                         if (confirmUsername.equals(publisher)) {
                                                             Log.d(TAG, "节点文本和publisher匹配成功");
+                                                            // 保证目标按钮在临界范围内
+                                                            guaranteeInCriticalRange(confirmNode, 600);
                                                             // 获取节点坐标
-                                                            bounds = new Rect();
-                                                            confirmNode.getBoundsInScreen(bounds);
-                                                            x = (bounds.left + bounds.right) / 2;
-                                                            y = (bounds.top + bounds.bottom) / 2;
-                                                            Log.d(TAG, "节点坐标: " + x + ", " + y);
-                                                            // 点击节点，坐标点击
-                                                            AutomationAccessibilityService.Click(x, y, 100);
-                                                            // 从配置当中获取等待时间,等待进入用户主页
-                                                            int enterHomePageWaitTime = settingsManager.getEnterHomePageWaitTime();
-                                                            AutomationAccessibilityService.Sleep(enterHomePageWaitTime);
+                                                            Log.d(TAG, "保证目标按钮在临界范围内");
+                                                            //获取最新的坐标信息，用于点击
+                                                            Log.d(TAG, "获取最新的坐标信息，用于点击");
+                                                            allElements = AutomationAccessibilityService.GetAllElements();
+                                                            if (allElements == null || allElements.isEmpty()) {
+                                                                Log.w(TAG, "无法获取页面元素，可能页面未加载完成");
+                                                                return false;
+                                                            }
+                                                            usernameNodes = AutomationAccessibilityService.findElementListById(allElements, "com.shizhuang.duapp:id/tvUsername");
+                                                            if (usernameNodes == null || usernameNodes.isEmpty()) {
+                                                                Log.w(TAG, "无法获取id为com.shizhuang.duapp:id/tvUsername的节点");
+                                                                return false;
+                                                            }
+                                                            for (AccessibilityNodeInfo node : usernameNodes) {
+                                                                if (node == null) continue;
+                                                                String text = node.getText() != null ? node.getText().toString() : "";
+                                                                if (text.equals(publisher)) {
+                                                                    Log.d(TAG, "节点文本和publisher匹配成功");
+                                                                    bounds = new Rect();
+                                                                    node.getBoundsInScreen(bounds);
+                                                                    x = (bounds.left + bounds.right) / 2;
+                                                                    y = (bounds.top + bounds.bottom) / 2;
+                                                                    Log.d(TAG, "节点坐标: " + x + ", " + y);
+                                                                    // 点击节点，坐标点击
+                                                                    AutomationAccessibilityService.Click(x, y, 100);
+                                                                    // 从配置当中获取等待时间,等待进入用户主页
+                                                                    int enterHomePageWaitTime = settingsManager.getEnterHomePageWaitTime();
+                                                                    AutomationAccessibilityService.Sleep(enterHomePageWaitTime);
+                                                                    return true;
+                                                                }
+                                                            }
                                                             return true;
                                                         }
                                                     }
@@ -1289,5 +1359,83 @@ public class AutomationScriptExecutor {
         }
         
         return depth;
+    }
+    
+    
+    // 保证目标按钮在临界范围内
+    private void guaranteeInCriticalRange(AccessibilityNodeInfo targetNode, int threshold){
+        // 获取屏幕尺寸
+        android.util.DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        int screenWidth = metrics.widthPixels;
+        int screenHeight = metrics.heightPixels;
+        // 获取目标控件的文本
+        String nodeText = targetNode.getText() != null ? targetNode.getText().toString() : "";
+        // 获取所有元素
+        List<AccessibilityNodeInfo> allElements = AutomationAccessibilityService.GetAllElements();
+        if (allElements == null || allElements.isEmpty()) {
+            Log.w(TAG, "无法获取页面元素，可能页面未加载完成");
+            return;
+        }
+        // 获取id为com.shizhuang.duapp:id/tvUsername的TextView节点
+        List<AccessibilityNodeInfo> usernameNodes = AutomationAccessibilityService.findElementListById(allElements, "com.shizhuang.duapp:id/tvUsername");
+        if (usernameNodes == null || usernameNodes.isEmpty()) {
+            Log.w(TAG, "无法获取id为com.shizhuang.duapp:id/tvUsername的节点");
+            return;
+        }
+        // 匹配相应的文本
+        for (AccessibilityNodeInfo node : usernameNodes) {
+            if (node == null) continue;
+            String text = node.getText() != null ? node.getText().toString() : "";
+            if (text.equals(nodeText)) {
+                // 获取节点坐标
+                Rect bounds = new Rect();
+                node.getBoundsInScreen(bounds);
+                int x = (bounds.left + bounds.right) / 2;
+                int y = (bounds.top + bounds.bottom) / 2;
+                // 判断坐标是否符合要求
+                if (y >= threshold && y <= screenHeight - threshold) {
+                    // 如果满足条件，则退出函数
+                    // AutomationAccessibilityService.Click(x, y, 100);
+                    return;
+                }
+                else {
+                    // 如果条件不满足，则滚动屏幕，判断是向下还是向上滚动
+                    int scrollDistance;
+                    if (y > screenHeight - threshold) {
+                        scrollDistance = y - (screenHeight - threshold);
+                        int length = 600;
+                        int startX = screenWidth / 2;
+                        int startY = screenHeight - 400;
+                        int endX = screenWidth / 2;
+                        int endY = startY - scrollDistance;
+                        int swipeDuration = 1500;
+                        AutomationAccessibilityService.Swipe(startX, startY, endX, endY, swipeDuration);
+                        AutomationAccessibilityService.Sleep(2000);
+                    } else if (y < threshold) {
+                        scrollDistance = threshold - y;
+                        int length = 600;
+                        int startX = screenWidth / 2;
+                        int startY = 400;
+                        int endX = screenWidth / 2;
+                        int endY = startY + scrollDistance;
+                        int swipeDuration = 1500;
+                        AutomationAccessibilityService.Swipe(startX, startY, endX, endY, swipeDuration);
+                        AutomationAccessibilityService.Sleep(2000);
+                    }
+                    else { 
+                        int length = 600;
+                        int startX = screenWidth / 2;
+                        int startY = y;
+                        int endX = screenWidth / 2;
+                        int endY = startY + length;
+                        int swipeDuration = 1500;
+                        AutomationAccessibilityService.Swipe(startX, startY, endX, endY, swipeDuration);
+                        AutomationAccessibilityService.Sleep(2000);
+                    }
+                }
+            }
+        }
+        // 进行下一个循环
+        guaranteeInCriticalRange(targetNode,600);
     }
 }
